@@ -13,13 +13,8 @@ const Navbar: React.FC = () => {
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink className="navbar-brand" to="/linea-poh" end>
-              Linea POH
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink className="navbar-brand" to="/sdk-demo" end>
-              SDK Demo
+            <NavLink className="navbar-brand" to="/profile" end>
+              Profile
             </NavLink>
           </li>
         </ul>
