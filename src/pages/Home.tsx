@@ -1,5 +1,5 @@
 import veraxLogo from "../assets/verax-logo-circle.svg";
-import CreateAttestation from "../components/CreateAttestation";
+import CreateAttestationForm from "../components/CreateAttestationForm";
 import "./Home.css";
 import { type FunctionComponent, useEffect } from "react";
 
@@ -20,14 +20,14 @@ const Home: FunctionComponent<HomeProps> = ({ title }) => {
         </a>
       </div>
 
-      <h1>Verax Attestation Registry</h1>
+      <h1>Prometheus</h1>
       <p>
-        Verax is a shared registry for storing attestations of public interest
-        on EVM chains,
-        <br /> designed to enhance data discoverability and consumption for
-        dApps across the network.{" "}
+        Create an attestation of your project and inspire others to build on
+        top.
+        <br />
+        Increase your on-chain reputation and create a network of projects.
       </p>
-      <CreateAttestation />
+      <CreateAttestationForm />
     </>
   );
 };

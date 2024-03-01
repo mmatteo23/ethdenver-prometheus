@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 import React from "react";
+import ConnectButton from "./ConnectButton";
 
 const Navbar: React.FC = () => {
   return (
@@ -16,6 +17,9 @@ const Navbar: React.FC = () => {
             <NavLink className="navbar-brand" to="/profile" end>
               Profile
             </NavLink>
+          </li>
+          <li className="nav-item">
+            <ConnectButton />
           </li>
         </ul>
       </div>
