@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useConnectWallet } from "@web3-onboard/react";
+import CreateAttestationLinks from "../components/CreateAttestationLinks";
 
 export type IAttestation = {
   id: string;
@@ -57,6 +58,7 @@ const Profile = () => {
           description={project.description}
         />
       ))}
+      <CreateAttestationLinks />
     </div>
   );
 };
