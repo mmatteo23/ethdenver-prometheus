@@ -1,4 +1,3 @@
-import CreateAttestationForm from "../components/CreateAttestationForm";
 // import CreateNewSchema from "../components/CreateNewSchema";
 import GetProjects from "../components/GetProjects";
 import "./Home.css";
