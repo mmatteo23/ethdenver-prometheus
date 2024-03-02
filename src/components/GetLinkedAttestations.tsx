@@ -6,7 +6,7 @@ import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 // const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
 
-const GetProjects = () => {
+const GetLinkedAttestations = () => {
   const [error, setError] = useState<string>("");
   const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
   const [{ wallet }] = useConnectWallet();
@@ -77,4 +77,4 @@ const GetProjects = () => {
   );
 };
 
-export default GetProjects;
+export default GetLinkedAttestations;

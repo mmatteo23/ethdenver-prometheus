@@ -1,7 +1,7 @@
 import { useConnectWallet } from "@web3-onboard/react";
 import React, { useEffect, useState } from "react";
 import { useNetwork } from "wagmi";
-import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
+import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 // import { toBytes } from "viem";
 import Select from "react-select";
 
@@ -21,22 +21,24 @@ const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
 // const SCHEMA_ID =
 //   "0x89bd76e17fd84df8e1e448fa1b46dd8d97f7e8e806552b003f8386a5aebcb9f0";
 
-const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
+const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 
-// const Linea_AttestationId =
-//   "000000000000000000000000000000000000000000000000000000000000173d";
-// const Prometheus_AttestationId =
-//   "000000000000000000000000000000000000000000000000000000000000173e";
+const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
 
 const CreateAttestationLinks = () => {
   const [selectedOptions, setSelectedOptions] = useState(null);
   const [selectOptions, setSelectOptions] = useState([]);
+
+  const [selectedMyOptions, setSelectedMyOptions] = useState(null);
+  const [selectMyOptions, setSelectMyOptions] = useState([]);
 
   const [error, setError] = useState<string>("");
   const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
   const [{ wallet }] = useConnectWallet();
   const { chain } = useNetwork();
   const [txHash, setTxHash] = useState<string>("");
+  const [attestations, setAttestations] = useState<Attestation[]>([]);
+  const [myAttestations, setMyAttestations] = useState<Attestation[]>([]);
 
   const accountData = wallet?.accounts[0];
 
@@ -51,17 +53,60 @@ const CreateAttestationLinks = () => {
     }
   }, [chain, accountData?.address]);
 
+  useEffect(() => {
+    if (veraxSdk && accountData?.address) {
+      getAttestationsBySchemaId().catch((e) => console.error(e));
+      getAttestationsByUser().catch((e) => console.error(e));
+    } else {
+      setAttestations(JSON.parse(JSON.stringify(attestationsData)));
+    }
+  }, [veraxSdk, accountData?.address]);
+
   // load all attestations as selectable options
   useEffect(() => {
     const tmpSelectOptions = [];
-    attestationsData.forEach((attestation) => {
+    attestations.forEach((attestation) => {
       tmpSelectOptions.push({
         value: attestation.id,
         label: attestation.decodedPayload[0].projectName,
       });
     });
     setSelectOptions(tmpSelectOptions);
-  }, []);
+  }, [attestations]);
+
+  useEffect(() => {
+    const tmpSelectOptions = [];
+    myAttestations.forEach((attestation) => {
+      tmpSelectOptions.push({
+        value: attestation.id,
+        label: attestation.decodedPayload[0].projectName,
+      });
+    });
+    setSelectMyOptions(tmpSelectOptions);
+  }, [myAttestations]);
+
+  const getAttestationsBySchemaId = async () => {
+    if (veraxSdk && accountData?.address) {
+      try {
+        const result = await veraxSdk.attestation.findBy(
+          undefined,
+          undefined,
+          { schemaId: SCHEMA_ID },
+          "attestedDate",
+          undefined
+        );
+        setAttestations(result);
+        console.log("Attestations", result);
+      } catch (e) {
+        console.log(e);
+        if (e instanceof Error) {
+          setError(`Oops, something went wrong: ${e.message}`);
+        }
+      }
+    } else {
+      console.error("SDK not instantiated");
+    }
+  };
 
   const createAnAttestation = async (
     subject_id: string,
@@ -112,13 +157,33 @@ const CreateAttestationLinks = () => {
     }
   };
 
+  const getAttestationsByUser = async () => {
+    if (veraxSdk && accountData?.address) {
+      try {
+        const result = await veraxSdk.attestation.findBy(
+          undefined,
+          undefined,
+          { schemaId: SCHEMA_ID, subject: accountData.address },
+          "attestedDate",
+          undefined
+        );
+        setMyAttestations(result);
+        console.log("My Attestations", result);
+      } catch (e) {
+        console.log(e);
+        if (e instanceof Error) {
+          setError(`Oops, something went wrong: ${e.message}`);
+        }
+      }
+    } else {
+      console.error("SDK not instantiated");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const target = e.target as typeof e.target & {
-      baseProject: { value: string };
-      linkedAttestations: { value: string };
-    };
-    const baseProject = target.baseProject.value;
+
+    const baseProject = selectedMyOptions.value;
     const attestationToLink = selectedOptions.value;
 
     await createAnAttestation(baseProject, "inspiredBy", attestationToLink);
@@ -138,11 +203,11 @@ const CreateAttestationLinks = () => {
           <CardContent>
             <div className="flex flex-col gap-4">
               <label htmlFor="baseProject">Choose a project</label>
-              <input
-                type="text"
-                name="baseProject"
-                placeholder="Project id"
-                className="bg-slate-100 px-2"
+              <Select
+                defaultValue={selectedMyOptions}
+                onChange={setSelectedMyOptions}
+                options={selectMyOptions}
+                isMulti={false}
               />
 
               <label htmlFor="attestationToLink">Inspired by</label>

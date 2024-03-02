@@ -5,6 +5,13 @@ import CreateAttestationForm from "../components/CreateAttestationForm";
 import GetProjectsByUser from "../components/GetProjectsByUser";
 import ConnectButton from "../components/ConnectButton";
 import "./Profile.css";
+import { useNetwork } from "wagmi";
+import { useEffect, useState } from "react";
+import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
+
+import { attestationsData } from "../utils/costants";
+const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
+const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
 
 export type IAttestation = {
   id: string;
@@ -13,28 +20,75 @@ export type IAttestation = {
 };
 
 const Profile = () => {
+  const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
   const [{ wallet }] = useConnectWallet();
+  const { chain } = useNetwork();
+  const [attestationsCounter, setAttestationsCounter] = useState<number>(0);
+  const [linkedAttestationsCounter, setLinkedAttestationsCounter] =
+    useState<number>(0);
 
   const accountData = wallet?.accounts[0];
 
-  // useEffect(() => {
-  //   // Fetch attestations
-  //   setMyAttestations([
-  //     {
-  //       id: "0", // This is the attestation id
-  //       title: "Bitcoin",
-  //       description: "This is the first project",
-  //     },
-  //   ]);
-  //   // Fetch projects inspired
-  //   setProjectsInspired([
-  //     {
-  //       id: "1", // This is the attestation id
-  //       title: "Ethereum",
-  //       description: "This is the first attestation",
-  //     },
-  //   ]);
-  // }, []);
+  useEffect(() => {
+    if (chain && accountData?.address) {
+      const sdkConf =
+        chain.id === 59144
+          ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
+          : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
+      const sdk = new VeraxSdk(sdkConf, accountData?.address as `0x${string}`);
+      setVeraxSdk(sdk);
+    }
+  }, [chain, accountData?.address]);
+
+  useEffect(() => {
+    if (veraxSdk && accountData?.address) {
+      getAttestationsByUser();
+      getLinkedAttestationsByUser();
+    } else {
+      const attestations = JSON.parse(JSON.stringify(attestationsData));
+      setAttestationsCounter(attestations.length);
+    }
+  }, [veraxSdk, accountData?.address]);
+
+  const getAttestationsByUser = async () => {
+    if (veraxSdk && accountData?.address) {
+      try {
+        const result = await veraxSdk.attestation.findBy(
+          undefined,
+          undefined,
+          { schemaId: SCHEMA_ID, subject: accountData.address },
+          "attestedDate",
+          undefined
+        );
+        setAttestationsCounter(result.length);
+        console.log("Attestations", result);
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      console.error("SDK not instantiated");
+    }
+  };
+
+  const getLinkedAttestationsByUser = async () => {
+    if (veraxSdk && accountData?.address) {
+      try {
+        const result = await veraxSdk.attestation.findBy(
+          undefined,
+          undefined,
+          { schemaId: CUSTOM_SCHEMA_ID, subject: accountData.address },
+          "attestedDate",
+          undefined
+        );
+        setLinkedAttestationsCounter(result.length);
+        console.log("Linked Attestations", result);
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      console.error("SDK not instantiated");
+    }
+  };
 
   return (
     <>
@@ -60,11 +114,11 @@ const Profile = () => {
         <div className="cardContainer space-x-4 mt-4">
           <div className="counterCard border-2 border-solid rounded-md">
             <h3 className="cardTitle"># Attestations</h3>
-            <p>2</p>
+            <p>{attestationsCounter}</p>
           </div>
           <div className="counterCard border-2 border-solid rounded-md">
-            <h3 className="cardTitle"># Projects Inspired</h3>
-            <p>15</p>
+            <h3 className="cardTitle"># Links</h3>
+            <p>{linkedAttestationsCounter}</p>
           </div>
         </div>
         {/* {myAttestations.map((attestation, i) => (

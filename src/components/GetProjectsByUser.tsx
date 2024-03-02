@@ -19,6 +19,7 @@ import {
 } from "./ui/tooltip";
 
 import { attestationsData } from "../utils/costants";
+import React from "react";
 
 const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 
@@ -46,7 +47,7 @@ const GetProjectsByUser = () => {
 
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
-      getAttestationsBySchemaId();
+      getAttestationsByUser();
     } else {
       setAttestations(JSON.parse(JSON.stringify(attestationsData)));
     }
@@ -62,7 +63,7 @@ const GetProjectsByUser = () => {
       );
   }, [attestations]);
 
-  const getAttestationsBySchemaId = async () => {
+  const getAttestationsByUser = async () => {
     if (veraxSdk && accountData?.address) {
       try {
         const result = await veraxSdk.attestation.findBy(
