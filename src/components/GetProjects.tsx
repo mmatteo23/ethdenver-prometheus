@@ -48,7 +48,7 @@ const GetProjects = () => {
     if (veraxSdk && accountData?.address) {
       getAttestationsBySchemaId();
     } else {
-      setAttestations(JSON.parse(JSON.stringify(attestationsData)));
+      // setAttestations(JSON.parse(JSON.stringify(attestationsData)));
     }
   }, [veraxSdk, accountData?.address]);
 
@@ -85,6 +85,12 @@ const GetProjects = () => {
     }
   };
 
+  const lessUsername = (username: string) => {
+    if (username.length < 10 || !username) {
+      return username;
+    } else return `${username.slice(0, 6)}...${username.slice(-4)}`;
+  };
+
   return (
     <>
       {error && <div className="text-red-500">{error}</div>}
@@ -96,6 +102,7 @@ const GetProjects = () => {
               <TableHead className="w-[100px]">Attestation Id</TableHead>
               <TableHead>Project Name</TableHead>
               <TableHead>Team Name</TableHead>
+              <TableHead>Owners</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -109,7 +116,9 @@ const GetProjects = () => {
                 >
                   <TooltipProvider>
                     <Tooltip>
-                      <TooltipTrigger>{attestation.id}</TooltipTrigger>
+                      <TooltipTrigger>
+                        {lessUsername(attestation.id)}
+                      </TooltipTrigger>
                       <TooltipContent>
                         <p>Click to copy to clipboard</p>
                       </TooltipContent>
@@ -125,6 +134,11 @@ const GetProjects = () => {
                   {JSON.parse(
                     JSON.stringify(attestation.decodedPayload[0].teamName)
                   )}
+                </TableCell>
+                <TableCell>
+                  {attestation.decodedPayload[0].owners
+                    .map((o) => lessUsername(o))
+                    .join(", ")}
                 </TableCell>
               </TableRow>
             ))}

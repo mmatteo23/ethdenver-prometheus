@@ -36,7 +36,6 @@ const CreateAttestationLinks = () => {
   const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
   const [{ wallet }] = useConnectWallet();
   const { chain } = useNetwork();
-  const [txHash, setTxHash] = useState<string>("");
   const [attestations, setAttestations] = useState<Attestation[]>([]);
   const [myAttestations, setMyAttestations] = useState<Attestation[]>([]);
 
@@ -145,7 +144,7 @@ const CreateAttestationLinks = () => {
           },
           []
         );
-        setTxHash(hash as string);
+        console.log("TX HASH", hash);
       } catch (e) {
         console.log(e);
         if (e instanceof Error) {
@@ -229,7 +228,6 @@ const CreateAttestationLinks = () => {
             </button>
           </CardFooter>
         </Card>
-        {txHash !== "" && <p>{`Transaction with hash ${txHash} sent!`}</p>}
         {error !== "" && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>

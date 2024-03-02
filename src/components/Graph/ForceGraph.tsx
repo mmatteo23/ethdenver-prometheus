@@ -134,12 +134,17 @@ const ForceGraph = () => {
     });
 
     attestationsLinks.forEach((link) => {
-      const sourceNode = nodes.find(
-        (node) => node.id === `0x${link.decodedPayload[0].subject}`
-      );
-      const targetNode = nodes.find(
-        (node) => node.id === `0x${link.decodedPayload[0].object}`
-      );
+      let linkSourceSubject =
+        (link.decodedPayload[0].subject as string).slice(0, 2) === "0x"
+          ? link.decodedPayload[0].subject
+          : `0x${link.decodedPayload[0].subject}`;
+      let linkSourceObject =
+        (link.decodedPayload[0].object as string).slice(0, 2) === "0x"
+          ? link.decodedPayload[0].object
+          : `0x${link.decodedPayload[0].object}`;
+
+      const sourceNode = nodes.find((node) => node.id === linkSourceSubject);
+      const targetNode = nodes.find((node) => node.id === linkSourceObject);
       if (!sourceNode || !targetNode) return;
 
       let uuidVal = "";

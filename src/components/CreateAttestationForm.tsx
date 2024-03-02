@@ -85,20 +85,12 @@ const CreateAttestationForm = () => {
       projectName: { value: string };
       owners: { value: string };
       teamName: { value: string };
-      inspirationIds: { value: string };
     };
     const projectName = target.projectName.value;
     const owners = target.owners.value.split(", ");
     const teamName = target.teamName.value;
-    const inspirationIds = target.inspirationIds.value.split(", ");
 
-    console.log(
-      "Create Attestation",
-      projectName,
-      owners,
-      teamName,
-      inspirationIds
-    );
+    console.log("Create Attestation", projectName, owners, teamName);
     await createAnAttestation(projectName, owners, teamName);
   };
 

@@ -86,6 +86,12 @@ const GetProjectsByUser = () => {
     }
   };
 
+  const lessUsername = (username: string) => {
+    if (username.length < 10 || !username) {
+      return username;
+    } else return `${username.slice(0, 6)}...${username.slice(-4)}`;
+  };
+
   return (
     <>
       <h2>List of your attestations</h2>
@@ -98,6 +104,7 @@ const GetProjectsByUser = () => {
               <TableHead className="w-[100px]">Attestation Id</TableHead>
               <TableHead>Project Name</TableHead>
               <TableHead>Team Name</TableHead>
+              <TableHead>Owners</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -111,7 +118,9 @@ const GetProjectsByUser = () => {
                 >
                   <TooltipProvider>
                     <Tooltip>
-                      <TooltipTrigger>{attestation.id}</TooltipTrigger>
+                      <TooltipTrigger>
+                        {lessUsername(attestation.id)}
+                      </TooltipTrigger>
                       <TooltipContent>
                         <p>Click to copy to clipboard</p>
                       </TooltipContent>
@@ -127,6 +136,11 @@ const GetProjectsByUser = () => {
                   {JSON.parse(
                     JSON.stringify(attestation.decodedPayload[0].teamName)
                   )}
+                </TableCell>
+                <TableCell>
+                  {attestation.decodedPayload[0].owners
+                    .map((o) => lessUsername(o))
+                    .join(", ")}
                 </TableCell>
               </TableRow>
             ))}
