@@ -1,5 +1,7 @@
 import veraxLogo from "../assets/verax-logo-circle.svg";
 import CreateAttestationForm from "../components/CreateAttestationForm";
+import CreateNewSchema from "../components/CreateNewSchema";
+import GetProjects from "../components/GetProjects";
 import "./Home.css";
 import { type FunctionComponent, useEffect } from "react";
 
@@ -28,6 +30,8 @@ const Home: FunctionComponent<HomeProps> = ({ title }) => {
         Increase your on-chain reputation and create a network of projects.
       </p>
       <CreateAttestationForm />
+      <CreateNewSchema />
+      <GetProjects />
     </>
   );
 };
