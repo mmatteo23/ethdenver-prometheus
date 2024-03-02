@@ -94,7 +94,7 @@ const CreateAttestationForm = () => {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <h1 className="text-xl font-bold">Create Attestation</h1>
+      <h1 className="text-3xl font-bold">Create Attestation</h1>
       <form onSubmit={handleSubmit} className="flex flex-col max-w-[90%]">
         <label htmlFor="projectName">Project Name</label>
         <input type="text" name="projectName" placeholder="Project Name" />

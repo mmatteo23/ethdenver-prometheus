@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-
-import ForceDirectedGraph, { FDGData } from "../components/Graph/FDGraph";
+import ForceGraph from "../components/Graph/ForceGraph";
 import type { LoaderFunctionArgs } from "react-router-dom";
 
 async function getAttestation(id: string | undefined) {
@@ -22,33 +20,12 @@ export async function loader({ params }: LoaderFunctionArgs) {
 const Explorer = () => {
   // const { contact } = useLoaderData();
   // console.log(contact);
-  const [data, setData] = useState<FDGData>({ nodes: [], links: [] });
-
-  useEffect(() => {
-    fetch("/graph.json", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((response) => {
-        setData(response);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
 
   return (
     <div>
       <h2>Explorer</h2>
       <div className="w-full items-center justify-center flex">
-        {data.nodes.length && data.links.length ? (
-          <ForceDirectedGraph data={data} />
-        ) : (
-          "Getting data..."
-        )}
+        <ForceGraph />
       </div>
     </div>
   );

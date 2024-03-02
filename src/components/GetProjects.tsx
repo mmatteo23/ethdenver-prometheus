@@ -2,6 +2,17 @@ import { useConnectWallet } from "@web3-onboard/react";
 import React, { useEffect, useState } from "react";
 import { useNetwork } from "wagmi";
 import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
+import {
+  Table,
+  TableCaption,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "./ui/table";
+
+import attestationJson from "../assets/attestations.json";
 
 const SCHEMA_ID =
   "0x0bccab24e4b6b6cc2a71e6bc2874c4d76affaafd28715328782ebb4397e380dd";
@@ -31,8 +42,20 @@ const GetProjects = () => {
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
       getAttestationsBySchemaId();
+    } else {
+      setAttestations(JSON.parse(JSON.stringify(attestationJson)));
     }
-  }, [veraxSdk]);
+  }, [veraxSdk, accountData?.address]);
+
+  useEffect(() => {
+    if (attestations.length > 0)
+      console.log(
+        "Attestations",
+        JSON.parse(
+          JSON.stringify(attestations[0].decodedPayload[0].projectName)
+        )
+      );
+  }, [attestations]);
 
   const getAttestationsBySchemaId = async () => {
     if (veraxSdk && accountData?.address) {
@@ -59,22 +82,36 @@ const GetProjects = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-4">
-        <h1 className="text-xl font-bold">Attestations</h1>
-        {!error ? (
-          attestations.map((attestation, i) => (
-            <div key={i} className="flex flex-col gap-2">
-              <p>{attestation.attestationId}</p>
-              <p>{attestation.attestedDate}</p>
-              <p>{attestation.attester}</p>
-              <p>{attestation.attestationData}</p>
-              <p>{JSON.stringify(attestation.decodedPayload)}</p>
-            </div>
-          ))
-        ) : (
-          <p>{error}</p>
-        )}
-      </div>
+      {error && <div className="text-red-500">{error}</div>}
+      {attestations.length > 0 ? (
+        <Table>
+          <TableCaption>A list of all attestations</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Attestation Id</TableHead>
+              <TableHead>Project Name</TableHead>
+              <TableHead>Team Name</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {attestations.map((attestation, i) => (
+              <TableRow key={i}>
+                <TableCell>{attestation.id}</TableCell>
+                <TableCell>
+                  {JSON.parse(
+                    JSON.stringify(attestation.decodedPayload[0].projectName)
+                  )}
+                </TableCell>
+                <TableCell>
+                  {JSON.parse(
+                    JSON.stringify(attestation.decodedPayload[0].teamName)
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : null}
     </>
   );
 };
