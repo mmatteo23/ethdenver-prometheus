@@ -40,6 +40,7 @@ const ForceGraph = () => {
         linkDirectionalParticles={2}
         linkDirectionalParticleWidth={2}
         d3VelocityDecay={0.3}
+        width={1270}
         height={550}
         maxZoom={2}
         minZoom={0.5}
