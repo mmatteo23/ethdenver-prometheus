@@ -2,16 +2,19 @@ import { useConnectWallet } from "@web3-onboard/react";
 import React, { useEffect, useState } from "react";
 import { useNetwork } from "wagmi";
 import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
+// import { toBytes } from "viem";
 
-const PORTAL_ID = "0x6ae91f2e1657a86aabd186e7c3525bc617ce54ce";
+const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
 // Relationship Schema
-const SCHEMA_ID =
-  "0x89bd76e17fd84df8e1e448fa1b46dd8d97f7e8e806552b003f8386a5aebcb9f0";
+// const SCHEMA_ID =
+//   "0x89bd76e17fd84df8e1e448fa1b46dd8d97f7e8e806552b003f8386a5aebcb9f0";
 
-const Linea_AttestationId =
-  "0x000000000000000000000000000000000000000000000000000000000000173d";
-const Prometheus_AttestationId =
-  "0x000000000000000000000000000000000000000000000000000000000000173e";
+const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
+
+// const Linea_AttestationId =
+//   "000000000000000000000000000000000000000000000000000000000000173d";
+// const Prometheus_AttestationId =
+//   "000000000000000000000000000000000000000000000000000000000000173e";
 
 const CreateAttestationLinks = () => {
   const [error, setError] = useState<string>("");
@@ -43,16 +46,21 @@ const CreateAttestationLinks = () => {
         console.log(
           "Creating attestation with these params:",
           PORTAL_ID,
-          SCHEMA_ID,
+          CUSTOM_SCHEMA_ID,
           Math.floor(Date.now() / 1000) + 25920000,
           subject_id,
           predicate,
           object_id
         );
+        console.log({
+          subject: subject_id,
+          predicate: predicate,
+          object: object_id,
+        });
         const hash = await veraxSdk.portal.attest(
           PORTAL_ID,
           {
-            schemaId: SCHEMA_ID,
+            schemaId: CUSTOM_SCHEMA_ID,
             expirationDate: Math.floor(Date.now() / 1000) + 25920000,
             subject: accountData.address as string,
             attestationData: [
@@ -79,49 +87,36 @@ const CreateAttestationLinks = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // const target = e.target as typeof e.target & {
-    //   subject_id: { value: string };
-    //   object_id: { value: string };
-    // };
-    // const projectName = target.subject_id.value;
-    // const teamName = target.object_id.value;
+    const target = e.target as typeof e.target & {
+      baseProject: { value: string };
+      linkedAttestations: { value: string };
+    };
+    const baseProject = target.baseProject.value;
+    const attestationToLink = target.linkedAttestations.value;
 
-    await createAnAttestation(
-      Prometheus_AttestationId,
-      "inspiredBy",
-      Linea_AttestationId
-    );
+    await createAnAttestation(baseProject, "inspiredBy", attestationToLink);
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <h1 className="text-xl font-bold">Link other projects</h1>
+    <div className="flex flex-col items-center gap-4 w-6/12">
+      <h1 className="text-2xl font-bold">Step2: Link other projects</h1>
       <form onSubmit={handleSubmit} className="flex flex-col max-w-[90%]">
-        <label htmlFor="projectName">Project Name</label>
-        <input type="text" name="projectName" placeholder="Project Name" />
+        <label htmlFor="baseProject">Choose a project</label>
+        <input type="text" name="baseProject" placeholder="Project id" />
 
-        <label htmlFor="owner">Owners</label>
-        <input type="text" name="owners" placeholder="owner1, owner2, owner3" />
-
-        <label htmlFor="owner">Team Name</label>
+        <label htmlFor="attestationToLink">Inspired by</label>
         <input
           type="text"
-          name="teamName"
-          placeholder="supreme ethdenver team"
+          name="attestationToLink"
+          placeholder="Attestation id"
         />
 
-        <label htmlFor="inspirationIds">Inspiration Attestation Ids</label>
-        <input
-          name="inspirationIds"
-          type="text"
-          placeholder="attestationId1, attestationId2, attestationId3"
-        />
         <button
           type="submit"
           className="btn btn-primary p-2 bg-slate-300 rounded-lg"
           disabled={!accountData?.address || !veraxSdk}
         >
-          Create Attestation
+          Create Link
         </button>
         {txHash !== "" && <p>{`Transaction with hash ${txHash} sent!`}</p>}
         {error !== "" && <p style={{ color: "red" }}>{error}</p>}

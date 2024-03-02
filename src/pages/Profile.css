@@ -1,0 +1,21 @@
+div.cardContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+div.counterCard {
+  width: 30%;
+  padding: 1em;
+}
+
+h3.cardTitle {
+  font-size: x-large;
+  font-weight: bold;
+  text-align: left;
+}
+
+div.counterCard p {
+  font-size: 3em;
+  font-weight: bold;
+  text-align: left;
+}

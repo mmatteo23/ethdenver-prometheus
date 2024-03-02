@@ -1,5 +1,5 @@
 import { useConnectWallet } from "@web3-onboard/react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNetwork } from "wagmi";
 import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 import {
@@ -11,18 +11,13 @@ import {
   TableBody,
   TableCell,
 } from "./ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
 
 import attestationJson from "../assets/attestations.json";
+import React from "react";
 
 const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 
-const GetProjects = () => {
+const GetProjectsByUser = () => {
   const [error, setError] = useState<string>("");
   const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
   const [{ wallet }] = useConnectWallet();
@@ -68,7 +63,7 @@ const GetProjects = () => {
         const result = await veraxSdk.attestation.findBy(
           undefined,
           undefined,
-          { schemaId: SCHEMA_ID },
+          { schemaId: SCHEMA_ID, subject: accountData.address },
           "attestedDate",
           undefined
         );
@@ -87,10 +82,11 @@ const GetProjects = () => {
 
   return (
     <>
+      <h2>List of your attestations</h2>
       {error && <div className="text-red-500">{error}</div>}
       {attestations.length > 0 ? (
         <Table>
-          <TableCaption>A list of all attestations</TableCaption>
+          <TableCaption>List of your attestations</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">Attestation Id</TableHead>
@@ -101,21 +97,7 @@ const GetProjects = () => {
           <TableBody>
             {attestations.map((attestation, i) => (
               <TableRow key={i}>
-                <TableCell
-                  className="cursor-pointer"
-                  onClick={() => {
-                    navigator.clipboard.writeText(attestation.id);
-                  }}
-                >
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>{attestation.id}</TooltipTrigger>
-                      <TooltipContent>
-                        <p>Click to copy to clipboard</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </TableCell>
+                <TableCell>{attestation.id}</TableCell>
                 <TableCell>
                   {JSON.parse(
                     JSON.stringify(attestation.decodedPayload[0].projectName)
@@ -130,9 +112,11 @@ const GetProjects = () => {
             ))}
           </TableBody>
         </Table>
-      ) : null}
+      ) : (
+        "No attestations found."
+      )}
     </>
   );
 };
 
-export default GetProjects;
+export default GetProjectsByUser;

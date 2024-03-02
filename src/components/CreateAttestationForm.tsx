@@ -3,9 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useNetwork } from "wagmi";
 import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 
-const PORTAL_ID = "0x6ae91f2e1657a86aabd186e7c3525bc617ce54ce";
-const SCHEMA_ID =
-  "0x0bccab24e4b6b6cc2a71e6bc2874c4d76affaafd28715328782ebb4397e380dd";
+const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
+const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 
 const CreateAttestationForm = () => {
   const [error, setError] = useState<string>("");
@@ -15,6 +14,8 @@ const CreateAttestationForm = () => {
   const [txHash, setTxHash] = useState<string>("");
 
   const accountData = wallet?.accounts[0];
+
+  console.log("VERAX SDK", veraxSdk);
 
   useEffect(() => {
     if (chain && accountData?.address) {
@@ -93,8 +94,8 @@ const CreateAttestationForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <h1 className="text-3xl font-bold">Create Attestation</h1>
+    <div className="flex flex-col items-center gap-4 w-6/12">
+      <h1 className="text-2xl font-bold">Step1: Create Attestation</h1>
       <form onSubmit={handleSubmit} className="flex flex-col max-w-[90%]">
         <label htmlFor="projectName">Project Name</label>
         <input type="text" name="projectName" placeholder="Project Name" />
@@ -109,20 +110,13 @@ const CreateAttestationForm = () => {
           placeholder="supreme ethdenver team"
         />
 
-        <label htmlFor="inspirationIds">Inspiration Attestation Ids</label>
-        <input
-          name="inspirationIds"
-          type="text"
-          placeholder="attestationId1, attestationId2, attestationId3"
-        />
         <button
           type="submit"
           className="btn btn-primary p-2 bg-slate-300 rounded-lg"
           disabled={!accountData?.address || !veraxSdk}
         >
-          Create Attestation
+          Create
         </button>
-        {txHash !== "" && <p>{`Transaction with hash ${txHash} sent!`}</p>}
         {error !== "" && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>
