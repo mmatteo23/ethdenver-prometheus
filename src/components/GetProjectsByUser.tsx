@@ -11,9 +11,14 @@ import {
   TableBody,
   TableCell,
 } from "./ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
-import attestationJson from "../assets/attestations.json";
-import React from "react";
+import { attestationsData } from "../utils/costants";
 
 const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 
@@ -43,7 +48,7 @@ const GetProjectsByUser = () => {
     if (veraxSdk && accountData?.address) {
       getAttestationsBySchemaId();
     } else {
-      setAttestations(JSON.parse(JSON.stringify(attestationJson)));
+      setAttestations(JSON.parse(JSON.stringify(attestationsData)));
     }
   }, [veraxSdk, accountData?.address]);
 
@@ -97,7 +102,21 @@ const GetProjectsByUser = () => {
           <TableBody>
             {attestations.map((attestation, i) => (
               <TableRow key={i}>
-                <TableCell>{attestation.id}</TableCell>
+                <TableCell
+                  className="cursor-pointer"
+                  onClick={() => {
+                    navigator.clipboard.writeText(attestation.id);
+                  }}
+                >
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>{attestation.id}</TooltipTrigger>
+                      <TooltipContent>
+                        <p>Click to copy to clipboard</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
                 <TableCell>
                   {JSON.parse(
                     JSON.stringify(attestation.decodedPayload[0].projectName)

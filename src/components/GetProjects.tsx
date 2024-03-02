@@ -18,7 +18,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-import attestationJson from "../assets/attestations.json";
+import { attestationsData } from "../utils/costants";
 
 const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 
@@ -48,7 +48,7 @@ const GetProjects = () => {
     if (veraxSdk && accountData?.address) {
       getAttestationsBySchemaId();
     } else {
-      setAttestations(JSON.parse(JSON.stringify(attestationJson)));
+      setAttestations(JSON.parse(JSON.stringify(attestationsData)));
     }
   }, [veraxSdk, accountData?.address]);
 

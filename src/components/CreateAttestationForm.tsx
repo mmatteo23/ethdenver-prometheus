@@ -3,6 +3,15 @@ import React, { useEffect, useState } from "react";
 import { useNetwork } from "wagmi";
 import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+
 const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
 const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 
@@ -97,26 +106,48 @@ const CreateAttestationForm = () => {
     <div className="flex flex-col items-center gap-4 w-6/12">
       <h1 className="text-2xl font-bold">Step1: Create Attestation</h1>
       <form onSubmit={handleSubmit} className="flex flex-col max-w-[90%]">
-        <label htmlFor="projectName">Project Name</label>
-        <input type="text" name="projectName" placeholder="Project Name" />
+        <Card>
+          <CardHeader>
+            <CardTitle>Create an Attestation</CardTitle>
+            <CardDescription>Protect your IP with attestation</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4">
+              <label htmlFor="projectName">Project Name</label>
+              <input
+                type="text"
+                name="projectName"
+                placeholder="Project Name"
+                className="bg-slate-100 px-2"
+              />
 
-        <label htmlFor="owner">Owners</label>
-        <input type="text" name="owners" placeholder="owner1, owner2, owner3" />
+              <label htmlFor="owner">Owners</label>
+              <input
+                type="text"
+                name="owners"
+                placeholder="owner1, owner2, owner3"
+                className="bg-slate-100 px-2"
+              />
 
-        <label htmlFor="owner">Team Name</label>
-        <input
-          type="text"
-          name="teamName"
-          placeholder="supreme ethdenver team"
-        />
-
-        <button
-          type="submit"
-          className="btn btn-primary p-2 bg-slate-300 rounded-lg"
-          disabled={!accountData?.address || !veraxSdk}
-        >
-          Create
-        </button>
+              <label htmlFor="owner">Team Name</label>
+              <input
+                type="text"
+                name="teamName"
+                placeholder="supreme ethdenver team"
+                className="bg-slate-100 px-2"
+              />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <button
+              type="submit"
+              className="btn btn-primary p-2 border border-black rounded-lg"
+              disabled={!accountData?.address || !veraxSdk}
+            >
+              Create
+            </button>
+          </CardFooter>
+        </Card>
         {error !== "" && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>

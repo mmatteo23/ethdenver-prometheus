@@ -3,6 +3,18 @@ import React, { useEffect, useState } from "react";
 import { useNetwork } from "wagmi";
 import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 // import { toBytes } from "viem";
+import Select from "react-select";
+
+import { attestationsData } from "../utils/costants";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 
 const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
 // Relationship Schema
@@ -17,6 +29,9 @@ const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
 //   "000000000000000000000000000000000000000000000000000000000000173e";
 
 const CreateAttestationLinks = () => {
+  const [selectedOptions, setSelectedOptions] = useState(null);
+  const [selectOptions, setSelectOptions] = useState([]);
+
   const [error, setError] = useState<string>("");
   const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
   const [{ wallet }] = useConnectWallet();
@@ -35,6 +50,18 @@ const CreateAttestationLinks = () => {
       setVeraxSdk(sdk);
     }
   }, [chain, accountData?.address]);
+
+  // load all attestations as selectable options
+  useEffect(() => {
+    const tmpSelectOptions = [];
+    attestationsData.forEach((attestation) => {
+      tmpSelectOptions.push({
+        value: attestation.id,
+        label: attestation.decodedPayload[0].projectName,
+      });
+    });
+    setSelectOptions(tmpSelectOptions);
+  }, []);
 
   const createAnAttestation = async (
     subject_id: string,
@@ -92,7 +119,7 @@ const CreateAttestationLinks = () => {
       linkedAttestations: { value: string };
     };
     const baseProject = target.baseProject.value;
-    const attestationToLink = target.linkedAttestations.value;
+    const attestationToLink = selectedOptions.value;
 
     await createAnAttestation(baseProject, "inspiredBy", attestationToLink);
   };
@@ -101,23 +128,42 @@ const CreateAttestationLinks = () => {
     <div className="flex flex-col items-center gap-4 w-6/12">
       <h1 className="text-2xl font-bold">Step2: Link other projects</h1>
       <form onSubmit={handleSubmit} className="flex flex-col max-w-[90%]">
-        <label htmlFor="baseProject">Choose a project</label>
-        <input type="text" name="baseProject" placeholder="Project id" />
+        <Card>
+          <CardHeader>
+            <CardTitle>Create a Link</CardTitle>
+            <CardDescription>
+              Choose the project that inspired you
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4">
+              <label htmlFor="baseProject">Choose a project</label>
+              <input
+                type="text"
+                name="baseProject"
+                placeholder="Project id"
+                className="bg-slate-100 px-2"
+              />
 
-        <label htmlFor="attestationToLink">Inspired by</label>
-        <input
-          type="text"
-          name="attestationToLink"
-          placeholder="Attestation id"
-        />
-
-        <button
-          type="submit"
-          className="btn btn-primary p-2 bg-slate-300 rounded-lg"
-          disabled={!accountData?.address || !veraxSdk}
-        >
-          Create Link
-        </button>
+              <label htmlFor="attestationToLink">Inspired by</label>
+              <Select
+                defaultValue={selectedOptions}
+                onChange={setSelectedOptions}
+                options={selectOptions}
+                isMulti={false}
+              />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <button
+              type="submit"
+              className="btn btn-primary p-2 border border-black rounded-lg"
+              disabled={!accountData?.address || !veraxSdk}
+            >
+              Create Link
+            </button>
+          </CardFooter>
+        </Card>
         {txHash !== "" && <p>{`Transaction with hash ${txHash} sent!`}</p>}
         {error !== "" && <p style={{ color: "red" }}>{error}</p>}
       </form>
