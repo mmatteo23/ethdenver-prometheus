@@ -37,10 +37,6 @@ const Footer: React.FC = () => {
           <FontAwesomeIcon icon={faGithub} />
         </Link>
       </li>
-
-      <li className="social-icon__item social-icon__link lens">
-        <FollowOnLens handle="verax" title={"Follow us on Lens"} />
-      </li>
     </ul>
   );
 };

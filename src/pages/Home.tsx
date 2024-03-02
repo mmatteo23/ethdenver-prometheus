@@ -30,10 +30,8 @@ const Home: FunctionComponent<HomeProps> = ({ title }) => {
           <ForceGraph />
         </div>
       </section>
-      <section id="create-attestation" className="my-10">
-        <CreateAttestationForm />
-      </section>
       <section id="get-projects" className="my-10">
+        <h1 className="text-3xl">Explore attestations</h1>
         <GetProjects />
       </section>
     </>

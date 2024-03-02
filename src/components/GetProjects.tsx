@@ -11,6 +11,12 @@ import {
   TableBody,
   TableCell,
 } from "./ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 import attestationJson from "../assets/attestations.json";
 
@@ -96,7 +102,21 @@ const GetProjects = () => {
           <TableBody>
             {attestations.map((attestation, i) => (
               <TableRow key={i}>
-                <TableCell>{attestation.id}</TableCell>
+                <TableCell
+                  className="cursor-pointer"
+                  onClick={() => {
+                    navigator.clipboard.writeText(attestation.id);
+                  }}
+                >
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>{attestation.id}</TooltipTrigger>
+                      <TooltipContent>
+                        <p>Click to copy to clipboard</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
                 <TableCell>
                   {JSON.parse(
                     JSON.stringify(attestation.decodedPayload[0].projectName)

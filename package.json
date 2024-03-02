@@ -27,6 +27,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@lens-protocol/widgets-react": "^2.1.0",
     "@metamask/sdk-react": "^0.15.0",
+    "@radix-ui/react-tooltip": "^1.0.7",
     "@verax-attestation-registry/verax-sdk": "1.0.2",
     "@web3-onboard/core": "^2.21.2",
     "@web3-onboard/injected-wallets": "^2.10.11",

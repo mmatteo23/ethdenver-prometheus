@@ -7,18 +7,20 @@ const Navbar: React.FC = () => {
   return (
     <nav className="navbar navbar-light">
       <div className="container">
-        <ul className="nav navbar-nav pull-xs-right">
-          <li className="nav-item">
-            <NavLink className="navbar-brand" to="/" end>
-              Home
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink className="navbar-brand" to="/profile" end>
-              Profile
-            </NavLink>
-          </li>
-          <li className="nav-item">
+        <ul className="flex nav navbar-nav pull-xs-right justify-between">
+          <div className="">
+            <li className="nav-item">
+              <NavLink className="navbar-brand" to="/" end>
+                Home
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="navbar-brand" to="/profile" end>
+                Profile
+              </NavLink>
+            </li>
+          </div>
+          <li className="nav-item py-2">
             <ConnectButton />
           </li>
         </ul>
