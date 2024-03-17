@@ -4,7 +4,6 @@ import type { ForceGraphMethods } from "react-force-graph-2d";
 import * as d3 from "d3";
 import * as uuid from "uuid";
 
-import { attestationsData, attestationLinksData } from "../../utils/costants";
 import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 import { useConnectWallet } from "@web3-onboard/react";
 import { useNetwork } from "wagmi";
@@ -113,7 +112,7 @@ const ForceGraph = () => {
         d3VelocityDecay={0.3}
         width={1270}
         height={550}
-        maxZoom={2}
+        maxZoom={5}
         minZoom={0.5}
       />
     );
@@ -134,11 +133,11 @@ const ForceGraph = () => {
     });
 
     attestationsLinks.forEach((link) => {
-      let linkSourceSubject =
+      const linkSourceSubject =
         (link.decodedPayload[0].subject as string).slice(0, 2) === "0x"
           ? link.decodedPayload[0].subject
           : `0x${link.decodedPayload[0].subject}`;
-      let linkSourceObject =
+      const linkSourceObject =
         (link.decodedPayload[0].object as string).slice(0, 2) === "0x"
           ? link.decodedPayload[0].object
           : `0x${link.decodedPayload[0].object}`;

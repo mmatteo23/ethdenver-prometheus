@@ -19,7 +19,6 @@ import {
 } from "./ui/tooltip";
 
 import { attestationsData } from "../utils/costants";
-import React from "react";
 
 const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 

@@ -68,6 +68,7 @@ const CreateAttestationForm = () => {
           []
         );
         setTxHash(hash as string);
+        console.log("TX HASH", txHash);
       } catch (e) {
         console.log(e);
         if (e instanceof Error) {

@@ -30,6 +30,8 @@ const Profile = () => {
   const accountData = wallet?.accounts[0];
 
   useEffect(() => {
+    console.log("Chain", chain);
+    console.log("Account", accountData);
     if (chain && accountData?.address) {
       const sdkConf =
         chain.id === 59144
@@ -37,6 +39,7 @@ const Profile = () => {
           : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
       const sdk = new VeraxSdk(sdkConf, accountData?.address as `0x${string}`);
       setVeraxSdk(sdk);
+      console.log("Verax SDK (after init)", sdk);
     }
   }, [chain, accountData?.address]);
 

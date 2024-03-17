@@ -2,7 +2,6 @@ import "./Footer.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faTelegram } from "@fortawesome/free-brands-svg-icons";
 import { Link } from "react-router-dom";
-import { FollowOnLens } from "@lens-protocol/widgets-react";
 import React from "react";
 
 const Footer: React.FC = () => {

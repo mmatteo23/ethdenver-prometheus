@@ -1,5 +1,5 @@
 import { useConnectWallet } from "@web3-onboard/react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNetwork } from "wagmi";
 import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 import {
@@ -17,8 +17,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-
-import { attestationsData } from "../utils/costants";
 
 const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 
