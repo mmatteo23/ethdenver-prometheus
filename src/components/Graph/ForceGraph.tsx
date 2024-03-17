@@ -23,14 +23,15 @@ const ForceGraph = () => {
   const [attestationsLinks, setAttestationsLinks] = useState<Attestation[]>([]);
 
   useEffect(() => {
-    if (chain && accountData?.address) {
-      const sdkConf =
-        chain.id === 59144
-          ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
-          : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
-      const sdk = new VeraxSdk(sdkConf, accountData?.address as `0x${string}`);
-      setVeraxSdk(sdk);
-    }
+    // const sdkConf =
+    //   chain.id === 59144
+    //     ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
+    //     : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
+    const sdk = new VeraxSdk(
+      VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND,
+      accountData?.address as `0x${string}`
+    );
+    setVeraxSdk(sdk);
   }, [chain, accountData?.address]);
 
   useEffect(() => {

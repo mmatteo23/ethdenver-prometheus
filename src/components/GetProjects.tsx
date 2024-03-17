@@ -1,6 +1,7 @@
 import { useConnectWallet } from "@web3-onboard/react";
 import { useEffect, useState } from "react";
-import { useNetwork } from "wagmi";
+import { useSDK } from "@metamask/sdk-react";
+// import { useNetwork } from "wagmi";
 import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 import {
   Table,
@@ -24,23 +25,27 @@ const GetProjects = () => {
   const [error, setError] = useState<string>("");
   const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
   const [{ wallet }] = useConnectWallet();
-  const { chain } = useNetwork();
+  //  const { chain } = useNetwork();
+
+  const { chainId } = useSDK();
   const [attestations, setAttestations] = useState<Attestation[]>([]);
 
   const accountData = wallet?.accounts[0];
 
   console.log("VERAX SDK", veraxSdk);
-
+  console.log("chain", chainId);
+  console.log("account ", accountData?.address);
   useEffect(() => {
-    if (chain && accountData?.address) {
-      const sdkConf =
-        chain.id === 59144
-          ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
-          : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
-      const sdk = new VeraxSdk(sdkConf, accountData?.address as `0x${string}`);
-      setVeraxSdk(sdk);
-    }
-  }, [chain, accountData?.address]);
+    // const sdkConf =
+    //   chainId === "59144"
+    //     ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
+    //     : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
+    const sdk = new VeraxSdk(
+      VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND,
+      accountData?.address as `0x${string}`
+    );
+    setVeraxSdk(sdk);
+  }, [chainId]);
 
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
@@ -125,7 +130,7 @@ const GetProjects = () => {
                 </TableCell>
                 <TableCell>
                   {JSON.parse(
-                    JSON.stringify(attestation.decodedPayload[0].projectName)
+                    JSON.stringify(attestation.decodedPayload[0]?.projectName)
                   )}
                 </TableCell>
                 <TableCell>
