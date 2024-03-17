@@ -66,12 +66,6 @@ export const getAttestations = async (
       "attestedDate", // order by
       undefined // order direction
     );
-    console.log(
-      "getAttestationsBySchemaId result:",
-      result,
-      whereVerax,
-      isAttestationLink
-    );
     return result;
   } else {
     console.error("getAttestationsBySchemaId: SDK not instantiated");
