@@ -1,10 +1,10 @@
 import "./Profile.css";
+import { useEffect, useState } from "react";
 import { useConnectWallet } from "@web3-onboard/react";
 import CreateAttestationLinks from "../components/CreateAttestationLinks";
 import CreateAttestationForm from "../components/CreateAttestationForm";
 import GetProjects from "../components/GetProjects";
 import ConnectButton from "../components/ConnectButton";
-import { useEffect, useState } from "react";
 
 import { Attestation } from "@verax-attestation-registry/verax-sdk";
 import { getAttestations, useVeraxSdk } from "../utils/verax";
@@ -46,37 +46,14 @@ const Profile = () => {
           setMyAttestationsLinks(res);
         })
         .catch((e) => console.error(e));
-    } else {
-      console.log(
-        "veraxSdk not set or accountAddress",
-        veraxSdk,
-        accountData?.address
-      );
-    }
-  }, [veraxSdk, accountData?.address]);
-  useEffect(() => {
-    if (veraxSdk && accountData?.address) {
-      // get my attestations
-      getAttestations(veraxSdk, false, accountData?.address)
-        .then((res) => {
-          console.log("profile: my attestations", res);
-          setMyAttestations(res);
-        })
-        .catch((e) => console.error(e));
-    } else {
-      console.log(
-        "veraxSdk not set or accountAddress",
-        veraxSdk,
-        accountData?.address
-      );
     }
   }, [veraxSdk, accountData?.address]);
 
   return (
     <>
       {!wallet ? (
-        <div className="absolute z-10 w-[45%] h-[45%] ml-[20%] ">
-          <div className="flex flex-col gap-4">
+        <div className="absolute z-10 w-full">
+          <div className="flex flex-col gap-4 mx-auto mt-[10%] w-[40%]">
             <h1>Connect your wallet</h1>
             <p>
               You need to connect your wallet to manage your attestations and
@@ -87,7 +64,7 @@ const Profile = () => {
         </div>
       ) : null}
       <div
-        className={`flex flex-col gap-4 container mx-auto ${
+        className={`w-full lg:container flex flex-col gap-4 mx-auto ${
           !wallet ? "blur-xl" : ""
         }`}
       >
@@ -111,7 +88,7 @@ const Profile = () => {
           />
         </div>
 
-        <GetProjects filterByUser={true} attestations={attestations} />
+        <GetProjects filterByUser={true} attestations={myAttestations} />
       </div>
     </>
   );

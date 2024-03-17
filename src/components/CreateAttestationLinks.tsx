@@ -135,7 +135,7 @@ const CreateAttestationLinks = ({
             </button>
           </CardFooter>
         </Card>
-        {error !== "" && <p style={{ color: "red" }}>{error}</p>}
+        {error !== "" ? <p style={{ color: "red" }}>{error}</p> : null}
       </form>
     </div>
   );

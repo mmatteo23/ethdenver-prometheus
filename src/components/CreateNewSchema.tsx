@@ -49,8 +49,10 @@ const CreateNewSchema = () => {
           </CardFooter>
         </Card>
 
-        {txHash !== "" && <p>{`Transaction with hash ${txHash} sent!`}</p>}
-        {error !== "" && <p style={{ color: "red" }}>{error}</p>}
+        {txHash !== "" ? (
+          <p>{`Transaction with hash ${txHash} sent!`}</p>
+        ) : null}
+        {error !== "" ? <p style={{ color: "red" }}>{error}</p> : null}
       </form>
     </div>
   );

@@ -7,6 +7,17 @@ const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
 const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
 
+export type IAttestationPayload = {
+  projectName: string;
+  owners: string[];
+  teamName: string;
+};
+export type IAttestationLinkPayload = {
+  subject: string;
+  predicate: string;
+  object: string;
+};
+
 export const useVeraxSdk = () => {
   const [{ wallet }] = useConnectWallet();
   const accountAddress = wallet?.accounts[0].address;
@@ -49,27 +60,22 @@ export const getAttestations = async (
   }
   if (veraxSdk) {
     const result = await veraxSdk.attestation.findBy(
-      undefined,
-      undefined,
+      undefined, // first
+      undefined, // skip
+      whereVerax, // where
+      "attestedDate", // order by
+      undefined // order direction
+    );
+    console.log(
+      "getAttestationsBySchemaId result:",
+      result,
       whereVerax,
-      "attestedDate",
-      undefined
+      isAttestationLink
     );
     return result;
   } else {
     console.error("getAttestationsBySchemaId: SDK not instantiated");
   }
-};
-
-export type IAttestationPayload = {
-  projectName: string;
-  owners: string[];
-  teamName: string;
-};
-export type IAttestationLinkPayload = {
-  subject: string;
-  predicate: string;
-  object: string;
 };
 
 export const createAttestation = async (
@@ -87,7 +93,7 @@ export const createAttestation = async (
       attestationData: [payload],
     });
     const txHash = await veraxSdk.portal.attest(
-      PORTAL_ID,
+      PORTAL_ID, // portal address
       {
         schemaId: isAttestationLink ? CUSTOM_SCHEMA_ID : SCHEMA_ID,
         expirationDate: Math.floor(Date.now() / 1000) + 25920000,
@@ -106,10 +112,10 @@ export const createAttestation = async (
 export const createSchema = async (veraxSdk: VeraxSdk, userAddress: string) => {
   if (veraxSdk && userAddress) {
     const txHash = await veraxSdk.schema.create(
-      "New Relationship Schema",
-      "Custom Relationship Schema",
-      "https://ver.ax/#/tutorials",
-      "(string subject, string predicate, string object)"
+      "New Relationship Schema", // name
+      "Custom Relationship Schema", // description
+      "https://ver.ax/#/tutorials", // context
+      "(string subject, string predicate, string object)" // schemaString
     );
     console.log("createSchema txHash", txHash);
     return txHash;

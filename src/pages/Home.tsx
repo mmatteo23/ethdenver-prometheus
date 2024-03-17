@@ -48,20 +48,14 @@ const Home = ({ title }: { title: string }) => {
       getAttestations(veraxSdk, true)
         .then((res) => setAttestationsLinks(res))
         .catch((e) => console.error(e));
-    } else {
-      console.log(
-        "veraxSdk not set or accountAddress",
-        veraxSdk,
-        accountData?.address
-      );
     }
   }, [veraxSdk, accountData?.address]);
 
   return (
     <>
       {!wallet ? (
-        <div className="absolute z-10 w-full h-screen">
-          <div className="flex flex-col gap-4 mx-auto my-auto w-[45%] h-[45%]">
+        <div className="absolute z-10 w-full">
+          <div className="flex flex-col gap-4 mx-auto mt-[10%] w-[40%]">
             <h1>Connect your wallet</h1>
             <p>
               You need to connect your wallet to manage your attestations and
@@ -71,7 +65,7 @@ const Home = ({ title }: { title: string }) => {
           </div>
         </div>
       ) : null}
-      <div className={`my-10 ${!wallet ? "blur-xl" : ""}`}>
+      <div className={`w-full lg:container my-10 ${!wallet ? "blur-xl" : ""}`}>
         <div
           className="relative h-[400vh] bg-black w-full dark:border dark:border-white/[0.1] rounded-md pt-40 overflow-clip"
           ref={scrollRef}

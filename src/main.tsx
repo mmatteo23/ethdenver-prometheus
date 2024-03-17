@@ -1,7 +1,8 @@
+import "./index.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
-import "./index.css";
+
 import { WagmiConfig } from "wagmi";
 import { linea, lineaTestnet, mainnet } from "wagmi/chains";
 import { defaultWagmiConfig } from "@web3modal/wagmi/react";
