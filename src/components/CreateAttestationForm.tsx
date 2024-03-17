@@ -97,7 +97,7 @@ const CreateAttestationForm = () => {
               type="submit"
               className="btn btn-primary p-2 border border-black rounded-lg"
             >
-              Create
+              Create Attestation
             </button>
           </CardFooter>
         </Card>

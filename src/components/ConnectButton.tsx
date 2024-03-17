@@ -14,7 +14,7 @@ export default function ConnectButton() {
 
   if (accountData) {
     return (
-      <div className="flex flex-row">
+      <div className="flex flex-row gap-2">
         <div className="flex flex-col px-2 py-1 border rounded-lg text-xs">
           <b className="">{accountAddress}</b>
           <p>

@@ -7,9 +7,8 @@ import Profile from "./pages/Profile.tsx";
 function App() {
   return (
     <HashRouter>
-      <header>
-        <Navbar />
-      </header>
+      <Navbar />
+
       <Routes>
         <Route path="*" element={<Home title={"Prometeus"} />} />
         <Route path="/profile" element={<Profile />} />
