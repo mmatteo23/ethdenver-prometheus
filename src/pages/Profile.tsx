@@ -2,7 +2,7 @@
 import { useConnectWallet } from "@web3-onboard/react";
 import CreateAttestationLinks from "../components/CreateAttestationLinks";
 import CreateAttestationForm from "../components/CreateAttestationForm";
-import GetProjectsByUser from "../components/GetProjectsByUser";
+import GetProjects from "../components/GetProjects";
 import ConnectButton from "../components/ConnectButton";
 import "./Profile.css";
 import { useNetwork } from "wagmi";
@@ -10,8 +10,7 @@ import { useEffect, useState } from "react";
 import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 
 import { attestationsData } from "../utils/costants";
-const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
-const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
+import { getAttestations } from "../utils/verax";
 
 export type IAttestation = {
   id: string;
@@ -41,57 +40,28 @@ const Profile = () => {
       setVeraxSdk(sdk);
       console.log("Verax SDK (after init)", sdk);
     }
-  }, [chain, accountData?.address]);
+  }, [chain, accountData?.address, accountData]);
 
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
-      getAttestationsByUser();
-      getLinkedAttestationsByUser();
+      // get attestations
+      getAttestations(veraxSdk, false, accountData?.address)
+        .then((res) => {
+          setAttestationsCounter(res.length);
+        })
+        .catch((e) => console.error(e));
+
+      // get linked attestations
+      getAttestations(veraxSdk, true, accountData?.address)
+        .then((res) => {
+          setLinkedAttestationsCounter(res.length);
+        })
+        .catch((e) => console.error(e));
     } else {
       const attestations = JSON.parse(JSON.stringify(attestationsData));
       setAttestationsCounter(attestations.length);
     }
   }, [veraxSdk, accountData?.address]);
-
-  const getAttestationsByUser = async () => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        const result = await veraxSdk.attestation.findBy(
-          undefined,
-          undefined,
-          { schemaId: SCHEMA_ID, subject: accountData.address },
-          "attestedDate",
-          undefined
-        );
-        setAttestationsCounter(result.length);
-        console.log("Attestations", result);
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
-
-  const getLinkedAttestationsByUser = async () => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        const result = await veraxSdk.attestation.findBy(
-          undefined,
-          undefined,
-          { schemaId: CUSTOM_SCHEMA_ID, subject: accountData.address },
-          "attestedDate",
-          undefined
-        );
-        setLinkedAttestationsCounter(result.length);
-        console.log("Linked Attestations", result);
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
 
   return (
     <>
@@ -124,47 +94,15 @@ const Profile = () => {
             <p>{linkedAttestationsCounter}</p>
           </div>
         </div>
-        {/* {myAttestations.map((attestation, i) => (
-        <AttestationCard
-          key={i}
-          id={attestation.id}
-          title={attestation.title}
-          description={attestation.description}
-        />
-      ))} */}
-        {/* <h2 className="text-xl font-bold">Project that you inspired</h2>
-      {projectsInspired.map((project, i) => (
-        <AttestationCard
-          key={i}
-          id={project.id}
-          title={project.title}
-          description={project.description}
-        />
-      ))} */}
         <div className="flex place-content-between border-2 border-solid rounded-md p-4">
           <CreateAttestationForm />
           <CreateAttestationLinks />
         </div>
 
-        <GetProjectsByUser />
+        <GetProjects filterByUser={true} />
       </div>
     </>
   );
 };
-
-// const AttestationCard = ({ id, title, description }: IAttestation) => {
-//   return (
-//     <div className="border">
-//       <p>{id}</p>
-//       <h3>
-//         <b>Title</b>:{title}
-//       </h3>
-//       <p>
-//         <b>Description</b>
-//         {description}
-//       </p>
-//     </div>
-//   );
-// };
 
 export default Profile;

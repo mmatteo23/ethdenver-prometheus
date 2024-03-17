@@ -11,16 +11,13 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-
-const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
-const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
+import { createAttestation } from "../utils/verax";
 
 const CreateAttestationForm = () => {
   const [error, setError] = useState<string>("");
   const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
   const [{ wallet }] = useConnectWallet();
   const { chain } = useNetwork();
-  const [txHash, setTxHash] = useState<string>("");
 
   const accountData = wallet?.accounts[0];
 
@@ -37,49 +34,6 @@ const CreateAttestationForm = () => {
     }
   }, [chain, accountData?.address]);
 
-  const createAnAttestation = async (
-    projectName: string,
-    owners: string[],
-    teamName: string
-  ) => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        console.log(
-          "Creating attestation with these params:",
-          PORTAL_ID,
-          SCHEMA_ID,
-          Math.floor(Date.now() / 1000) + 25920000,
-          [accountData.address].concat(owners)
-        );
-        const hash = await veraxSdk.portal.attest(
-          PORTAL_ID,
-          {
-            schemaId: SCHEMA_ID,
-            expirationDate: Math.floor(Date.now() / 1000) + 25920000,
-            subject: accountData.address as string,
-            attestationData: [
-              {
-                projectName: projectName,
-                owners: [accountData.address].concat(owners),
-                teamName: teamName,
-              },
-            ],
-          },
-          []
-        );
-        setTxHash(hash as string);
-        console.log("TX HASH", txHash);
-      } catch (e) {
-        console.log(e);
-        if (e instanceof Error) {
-          setError(`Oops, something went wrong: ${e.message}`);
-        }
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const target = e.target as typeof e.target & {
@@ -92,7 +46,14 @@ const CreateAttestationForm = () => {
     const teamName = target.teamName.value;
 
     console.log("Create Attestation", projectName, owners, teamName);
-    await createAnAttestation(projectName, owners, teamName);
+    const payload = {
+      projectName: projectName,
+      owners: owners,
+      teamName: teamName,
+    };
+    createAttestation(veraxSdk, accountData?.address, false, payload).catch(
+      (e) => setError(e.message)
+    );
   };
 
   return (
@@ -135,7 +96,6 @@ const CreateAttestationForm = () => {
             <button
               type="submit"
               className="btn btn-primary p-2 border border-black rounded-lg"
-              disabled={!accountData?.address || !veraxSdk}
             >
               Create
             </button>

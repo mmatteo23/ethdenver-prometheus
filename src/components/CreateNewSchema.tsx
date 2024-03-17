@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { createSchema } from "../utils/verax";
 
 const CreateNewSchema = () => {
   const [error, setError] = useState<string>("");
@@ -34,30 +35,11 @@ const CreateNewSchema = () => {
     }
   }, [chain, accountData?.address]);
 
-  const createVeraxSchema = async () => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        const txHash = await veraxSdk.schema.create(
-          "New Relationship Schema",
-          "Custom Relationship Schema",
-          "https://ver.ax/#/tutorials",
-          "(string subject, string predicate, string object)"
-        );
-        setTxHash(txHash as string);
-      } catch (e) {
-        console.log(e);
-        if (e instanceof Error) {
-          setError(`Oops, something went wrong: ${e.message}`);
-        }
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await createVeraxSchema();
+    createSchema(veraxSdk, accountData?.address)
+      .then((res) => setTxHash(res))
+      .catch((e) => setError(e.message));
   };
 
   return (

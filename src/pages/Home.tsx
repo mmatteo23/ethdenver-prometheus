@@ -72,7 +72,7 @@ const Home: FunctionComponent<HomeProps> = ({ title }) => {
         </section>
         <section id="get-projects" className="my-10">
           <h1 className="text-3xl">Explore attestations</h1>
-          <GetProjects />
+          <GetProjects filterByUser={false} />
         </section>
       </div>
     </>

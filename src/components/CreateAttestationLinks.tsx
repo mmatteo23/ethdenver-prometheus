@@ -15,15 +15,11 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { createAttestation, getAttestations } from "../utils/verax";
 
-const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
 // Relationship Schema
 // const SCHEMA_ID =
 //   "0x89bd76e17fd84df8e1e448fa1b46dd8d97f7e8e806552b003f8386a5aebcb9f0";
-
-const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
-
-const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
 
 const CreateAttestationLinks = () => {
   const [selectedOptions, setSelectedOptions] = useState(null);
@@ -54,8 +50,15 @@ const CreateAttestationLinks = () => {
 
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
-      getAttestationsBySchemaId().catch((e) => console.error(e));
-      getAttestationsByUser().catch((e) => console.error(e));
+      // get attestations of user
+      getAttestations(veraxSdk, false)
+        .then((res) => setAttestations(res))
+        .catch((e) => setError(`Oops, something went wrong: ${e.message}`));
+
+      // get my attestations
+      getAttestations(veraxSdk, false, accountData?.address)
+        .then((res) => setMyAttestations(res))
+        .catch((e) => setError(`Oops, something went wrong: ${e.message}`));
     } else {
       setAttestations(JSON.parse(JSON.stringify(attestationsData)));
     }
@@ -84,108 +87,22 @@ const CreateAttestationLinks = () => {
     setSelectMyOptions(tmpSelectOptions);
   }, [myAttestations]);
 
-  const getAttestationsBySchemaId = async () => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        const result = await veraxSdk.attestation.findBy(
-          undefined,
-          undefined,
-          { schemaId: SCHEMA_ID },
-          "attestedDate",
-          undefined
-        );
-        setAttestations(result);
-        console.log("Attestations", result);
-      } catch (e) {
-        console.log(e);
-        if (e instanceof Error) {
-          setError(`Oops, something went wrong: ${e.message}`);
-        }
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
-
-  const createAnAttestation = async (
-    subject_id: string,
-    predicate: string,
-    object_id: string
-  ) => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        console.log(
-          "Creating attestation with these params:",
-          PORTAL_ID,
-          CUSTOM_SCHEMA_ID,
-          Math.floor(Date.now() / 1000) + 25920000,
-          subject_id,
-          predicate,
-          object_id
-        );
-        console.log({
-          subject: subject_id,
-          predicate: predicate,
-          object: object_id,
-        });
-        const hash = await veraxSdk.portal.attest(
-          PORTAL_ID,
-          {
-            schemaId: CUSTOM_SCHEMA_ID,
-            expirationDate: Math.floor(Date.now() / 1000) + 25920000,
-            subject: accountData.address as string,
-            attestationData: [
-              {
-                subject: subject_id,
-                predicate: predicate,
-                object: object_id,
-              },
-            ],
-          },
-          []
-        );
-        console.log("TX HASH", hash);
-      } catch (e) {
-        console.log(e);
-        if (e instanceof Error) {
-          setError(`Oops, something went wrong: ${e.message}`);
-        }
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
-
-  const getAttestationsByUser = async () => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        const result = await veraxSdk.attestation.findBy(
-          undefined,
-          undefined,
-          { schemaId: SCHEMA_ID, subject: accountData.address },
-          "attestedDate",
-          undefined
-        );
-        setMyAttestations(result);
-        console.log("My Attestations", result);
-      } catch (e) {
-        console.log(e);
-        if (e instanceof Error) {
-          setError(`Oops, something went wrong: ${e.message}`);
-        }
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const baseProject = selectedMyOptions.value;
     const attestationToLink = selectedOptions.value;
-
-    await createAnAttestation(baseProject, "inspiredBy", attestationToLink);
+    const payload = {
+      subject_id: baseProject,
+      predicate: "inspiredBy",
+      object_id: attestationToLink,
+    };
+    await createAttestation(
+      veraxSdk,
+      accountData?.address,
+      true,
+      payload
+    ).catch((e) => setError(`Oops, something went wrong: ${e.message}`));
   };
 
   return (

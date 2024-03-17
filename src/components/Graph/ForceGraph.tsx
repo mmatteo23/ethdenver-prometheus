@@ -7,9 +7,7 @@ import * as uuid from "uuid";
 import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 import { useConnectWallet } from "@web3-onboard/react";
 import { useNetwork } from "wagmi";
-
-const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
-const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
+import { getAttestations } from "../../utils/verax";
 
 const ForceGraph = () => {
   const [nodes, setNodes] = useState([]);
@@ -23,10 +21,6 @@ const ForceGraph = () => {
   const [attestationsLinks, setAttestationsLinks] = useState<Attestation[]>([]);
 
   useEffect(() => {
-    // const sdkConf =
-    //   chain.id === 59144
-    //     ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
-    //     : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
     const sdk = new VeraxSdk(
       VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND,
       accountData?.address as `0x${string}`
@@ -36,50 +30,17 @@ const ForceGraph = () => {
 
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
-      getAttestationsLinkBySchemaId().catch((e) => console.error(e));
-      getProjectsBySchemaId().catch((e) => console.error(e));
-    }
-  }, [veraxSdk]);
+      // get attestations
+      getAttestations(veraxSdk, false)
+        .then((res) => setAttestations(res))
+        .catch((e) => console.error(e));
 
-  const getAttestationsLinkBySchemaId = async () => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        const result = await veraxSdk.attestation.findBy(
-          undefined,
-          undefined,
-          { schemaId: CUSTOM_SCHEMA_ID },
-          "attestedDate",
-          undefined
-        );
-        setAttestationsLinks(result);
-        console.log("Linked Attestations", result);
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      console.error("SDK not instantiated");
+      // get attestations links
+      getAttestations(veraxSdk, true)
+        .then((res) => setAttestationsLinks(res))
+        .catch((e) => console.error(e));
     }
-  };
-
-  const getProjectsBySchemaId = async () => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        const result = await veraxSdk.attestation.findBy(
-          undefined,
-          undefined,
-          { schemaId: SCHEMA_ID },
-          "attestedDate",
-          undefined
-        );
-        setAttestations(result);
-        console.log("Attestations", result);
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
+  }, [veraxSdk, accountData?.address]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ForceTree = ({ data }: { data: { nodes: any; links: any } }) => {
