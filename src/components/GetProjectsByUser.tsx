@@ -1,6 +1,6 @@
 import { useConnectWallet } from "@web3-onboard/react";
 import { useEffect, useState } from "react";
-import { useNetwork } from "wagmi";
+// import { useNetwork } from "wagmi";
 import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 import {
   Table,
@@ -18,7 +18,12 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-import { attestationsData } from "../utils/costants";
+import {
+  LineaTestnetChain,
+  // attestationsData
+} from "../utils/costants";
+
+import { useSetChain } from "@web3-onboard/react";
 
 const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 
@@ -26,41 +31,61 @@ const GetProjectsByUser = () => {
   const [error, setError] = useState<string>("");
   const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
   const [{ wallet }] = useConnectWallet();
-  const { chain } = useNetwork();
+  // const { chain } = useNetwork();
   const [attestations, setAttestations] = useState<Attestation[]>([]);
+
+  const [
+    {
+      // chains, // the list of chains that web3-onboard was initialized with
+      connectedChain, // the current chain the user's wallet is connected to
+      // settingChain, // boolean indicating if the chain is in the process of being set
+    },
+    setChain, // function to call to initiate user to switch chains in their wallet
+  ] = useSetChain();
 
   const accountData = wallet?.accounts[0];
 
-  console.log("VERAX SDK", veraxSdk);
+  console.log("VERAX SDK (getProjectsByUser)", veraxSdk);
 
   useEffect(() => {
-    if (chain && accountData?.address) {
+    console.log("Connected Chain", connectedChain);
+    console.log("Account", accountData);
+    if (connectedChain && accountData?.address) {
       const sdkConf =
-        chain.id === 59144
+        connectedChain.id === LineaTestnetChain.id
           ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
           : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
       const sdk = new VeraxSdk(sdkConf, accountData?.address as `0x${string}`);
       setVeraxSdk(sdk);
+      console.log("Verax SDK (after init)", sdk);
+    } else {
+      console.error("Chain not connected");
+      if (accountData?.address) {
+        setChain({
+          chainId: LineaTestnetChain.id,
+        });
+      }
     }
-  }, [chain, accountData?.address]);
+  }, [connectedChain, accountData?.address, setChain]);
 
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
       getAttestationsByUser();
-    } else {
-      setAttestations(JSON.parse(JSON.stringify(attestationsData)));
     }
+    // else {
+    //   setAttestations(JSON.parse(JSON.stringify(attestationsData)));
+    // }
   }, [veraxSdk, accountData?.address]);
 
-  useEffect(() => {
-    if (attestations.length > 0)
-      console.log(
-        "Attestations",
-        JSON.parse(
-          JSON.stringify(attestations[0].decodedPayload[0].projectName)
-        )
-      );
-  }, [attestations]);
+  // useEffect(() => {
+  //   if (attestations.length > 0)
+  //     console.log(
+  //       "Attestations",
+  //       JSON.parse(
+  //         JSON.stringify(attestations[0].decodedPayload[0].projectName)
+  //       )
+  //     );
+  // }, [attestations]);
 
   const getAttestationsByUser = async () => {
     if (veraxSdk && accountData?.address) {
@@ -94,6 +119,7 @@ const GetProjectsByUser = () => {
   return (
     <>
       <h2>List of your attestations</h2>
+      {JSON.stringify(attestations, null, 2)}
       {error && <div className="text-red-500">{error}</div>}
       {attestations.length > 0 ? (
         <Table>

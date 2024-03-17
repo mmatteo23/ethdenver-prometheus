@@ -5,7 +5,7 @@ import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 // import { toBytes } from "viem";
 import Select from "react-select";
 
-import { attestationsData } from "../utils/costants";
+// import { attestationsData } from "../utils/costants";
 
 import {
   Card,
@@ -56,9 +56,10 @@ const CreateAttestationLinks = () => {
     if (veraxSdk && accountData?.address) {
       getAttestationsBySchemaId().catch((e) => console.error(e));
       getAttestationsByUser().catch((e) => console.error(e));
-    } else {
-      setAttestations(JSON.parse(JSON.stringify(attestationsData)));
     }
+    // else {
+    //   setAttestations(JSON.parse(JSON.stringify(attestationsData)));
+    // }
   }, [veraxSdk, accountData?.address]);
 
   // load all attestations as selectable options
@@ -95,7 +96,7 @@ const CreateAttestationLinks = () => {
           undefined
         );
         setAttestations(result);
-        console.log("Attestations", result);
+        console.log("getAttestationsBySchemaId", result);
       } catch (e) {
         console.log(e);
         if (e instanceof Error) {
@@ -167,7 +168,7 @@ const CreateAttestationLinks = () => {
           undefined
         );
         setMyAttestations(result);
-        console.log("My Attestations", result);
+        console.log("getAttestationsByUser", result);
       } catch (e) {
         console.log(e);
         if (e instanceof Error) {
