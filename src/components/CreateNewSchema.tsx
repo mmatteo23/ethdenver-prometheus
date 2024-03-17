@@ -1,7 +1,5 @@
 import { useConnectWallet } from "@web3-onboard/react";
-import React, { useEffect, useState } from "react";
-import { useNetwork } from "wagmi";
-import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
+import React, { useState } from "react";
 
 import {
   Card,
@@ -11,53 +9,21 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { createSchema, useVeraxSdk } from "../utils/verax";
 
 const CreateNewSchema = () => {
   const [error, setError] = useState<string>("");
-  const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
-  const [{ wallet }] = useConnectWallet();
-  const { chain } = useNetwork();
   const [txHash, setTxHash] = useState<string>("");
 
+  const [{ wallet }] = useConnectWallet();
   const accountData = wallet?.accounts[0];
-
-  console.log("VERAX SDK", veraxSdk);
-
-  useEffect(() => {
-    if (chain && accountData?.address) {
-      const sdkConf =
-        chain.id === 59144
-          ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
-          : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
-      const sdk = new VeraxSdk(sdkConf, accountData?.address as `0x${string}`);
-      setVeraxSdk(sdk);
-    }
-  }, [chain, accountData?.address]);
-
-  const createVeraxSchema = async () => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        const txHash = await veraxSdk.schema.create(
-          "New Relationship Schema",
-          "Custom Relationship Schema",
-          "https://ver.ax/#/tutorials",
-          "(string subject, string predicate, string object)"
-        );
-        setTxHash(txHash as string);
-      } catch (e) {
-        console.log(e);
-        if (e instanceof Error) {
-          setError(`Oops, something went wrong: ${e.message}`);
-        }
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
+  const veraxSdk = useVeraxSdk();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await createVeraxSchema();
+    createSchema(veraxSdk, accountData?.address)
+      .then((res) => setTxHash(res))
+      .catch((e) => setError(e.message));
   };
 
   return (
@@ -83,8 +49,10 @@ const CreateNewSchema = () => {
           </CardFooter>
         </Card>
 
-        {txHash !== "" && <p>{`Transaction with hash ${txHash} sent!`}</p>}
-        {error !== "" && <p style={{ color: "red" }}>{error}</p>}
+        {txHash !== "" ? (
+          <p>{`Transaction with hash ${txHash} sent!`}</p>
+        ) : null}
+        {error !== "" ? <p style={{ color: "red" }}>{error}</p> : null}
       </form>
     </div>
   );

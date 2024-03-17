@@ -1,7 +1,5 @@
 import { useConnectWallet } from "@web3-onboard/react";
 import React, { useEffect, useState } from "react";
-import { useNetwork } from "wagmi";
-import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 
 import {
   Card,
@@ -11,74 +9,27 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-
-const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
-const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
+import {
+  IAttestationPayload,
+  createAttestation,
+  useVeraxSdk,
+} from "../utils/verax";
 
 const CreateAttestationForm = () => {
   const [error, setError] = useState<string>("");
-  const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
+
   const [{ wallet }] = useConnectWallet();
-  const { chain } = useNetwork();
-  const [txHash, setTxHash] = useState<string>("");
-
   const accountData = wallet?.accounts[0];
+  const veraxSdk = useVeraxSdk();
 
-  console.log("VERAX SDK", veraxSdk);
-
+  // remove error after 3 seconds
   useEffect(() => {
-    if (chain && accountData?.address) {
-      const sdkConf =
-        chain.id === 59144
-          ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
-          : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
-      const sdk = new VeraxSdk(sdkConf, accountData?.address as `0x${string}`);
-      setVeraxSdk(sdk);
+    if (error !== "") {
+      setTimeout(() => {
+        setError("");
+      }, 3000);
     }
-  }, [chain, accountData?.address]);
-
-  const createAnAttestation = async (
-    projectName: string,
-    owners: string[],
-    teamName: string
-  ) => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        console.log(
-          "Creating attestation with these params:",
-          PORTAL_ID,
-          SCHEMA_ID,
-          Math.floor(Date.now() / 1000) + 25920000,
-          [accountData.address].concat(owners)
-        );
-        const hash = await veraxSdk.portal.attest(
-          PORTAL_ID,
-          {
-            schemaId: SCHEMA_ID,
-            expirationDate: Math.floor(Date.now() / 1000) + 25920000,
-            subject: accountData.address as string,
-            attestationData: [
-              {
-                projectName: projectName,
-                owners: [accountData.address].concat(owners),
-                teamName: teamName,
-              },
-            ],
-          },
-          []
-        );
-        setTxHash(hash as string);
-        console.log("TX HASH", txHash);
-      } catch (e) {
-        console.log(e);
-        if (e instanceof Error) {
-          setError(`Oops, something went wrong: ${e.message}`);
-        }
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
+  }, [error]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -92,7 +43,17 @@ const CreateAttestationForm = () => {
     const teamName = target.teamName.value;
 
     console.log("Create Attestation", projectName, owners, teamName);
-    await createAnAttestation(projectName, owners, teamName);
+    const payload: IAttestationPayload = {
+      projectName: projectName,
+      owners: [accountData.address].concat(owners),
+      teamName: teamName,
+    };
+    createAttestation(veraxSdk, accountData?.address, false, payload).catch(
+      (e) => {
+        console.error(e);
+        setError(`Oops3, something went wrong: ${e.message}`);
+      }
+    );
   };
 
   return (
@@ -135,7 +96,6 @@ const CreateAttestationForm = () => {
             <button
               type="submit"
               className="btn btn-primary p-2 border border-black rounded-lg"
-              disabled={!accountData?.address || !veraxSdk}
             >
               Create
             </button>

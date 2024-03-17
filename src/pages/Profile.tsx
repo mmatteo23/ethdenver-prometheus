@@ -1,17 +1,13 @@
-// import { useEffect, useState } from "react";
+import "./Profile.css";
+import { useEffect, useState } from "react";
 import { useConnectWallet } from "@web3-onboard/react";
 import CreateAttestationLinks from "../components/CreateAttestationLinks";
 import CreateAttestationForm from "../components/CreateAttestationForm";
-import GetProjectsByUser from "../components/GetProjectsByUser";
+import GetProjects from "../components/GetProjects";
 import ConnectButton from "../components/ConnectButton";
-import "./Profile.css";
-import { useNetwork } from "wagmi";
-import { useEffect, useState } from "react";
-import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 
-import { attestationsData } from "../utils/costants";
-const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
-const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
+import { Attestation } from "@verax-attestation-registry/verax-sdk";
+import { getAttestations, useVeraxSdk } from "../utils/verax";
 
 export type IAttestation = {
   id: string;
@@ -20,84 +16,44 @@ export type IAttestation = {
 };
 
 const Profile = () => {
-  const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
+  const [attestations, setAttestations] = useState<Attestation[]>();
+
+  const [myAttestations, setMyAttestations] = useState<Attestation[]>();
+  const [myAttestationsLinks, setMyAttestationsLinks] =
+    useState<Attestation[]>();
+
   const [{ wallet }] = useConnectWallet();
-  const { chain } = useNetwork();
-  const [attestationsCounter, setAttestationsCounter] = useState<number>(0);
-  const [linkedAttestationsCounter, setLinkedAttestationsCounter] =
-    useState<number>(0);
-
   const accountData = wallet?.accounts[0];
-
-  useEffect(() => {
-    console.log("Chain", chain);
-    console.log("Account", accountData);
-    if (chain && accountData?.address) {
-      const sdkConf =
-        chain.id === 59144
-          ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
-          : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
-      const sdk = new VeraxSdk(sdkConf, accountData?.address as `0x${string}`);
-      setVeraxSdk(sdk);
-      console.log("Verax SDK (after init)", sdk);
-    }
-  }, [chain, accountData?.address]);
+  const veraxSdk = useVeraxSdk();
 
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
-      getAttestationsByUser();
-      getLinkedAttestationsByUser();
-    } else {
-      const attestations = JSON.parse(JSON.stringify(attestationsData));
-      setAttestationsCounter(attestations.length);
+      // get all attestations
+      getAttestations(veraxSdk, false)
+        .then((res) => setAttestations(res))
+        .catch((e) => console.error(e));
+      // get all attestations links not needed (for now)
+
+      // get my attestations
+      getAttestations(veraxSdk, false, accountData?.address)
+        .then((res) => setMyAttestations(res))
+        .catch((e) => console.error(e));
+
+      // get my attestations links
+      getAttestations(veraxSdk, true, accountData?.address)
+        .then((res) => {
+          console.log("profile: my attestations links", res);
+          setMyAttestationsLinks(res);
+        })
+        .catch((e) => console.error(e));
     }
   }, [veraxSdk, accountData?.address]);
-
-  const getAttestationsByUser = async () => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        const result = await veraxSdk.attestation.findBy(
-          undefined,
-          undefined,
-          { schemaId: SCHEMA_ID, subject: accountData.address },
-          "attestedDate",
-          undefined
-        );
-        setAttestationsCounter(result.length);
-        console.log("Attestations", result);
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
-
-  const getLinkedAttestationsByUser = async () => {
-    if (veraxSdk && accountData?.address) {
-      try {
-        const result = await veraxSdk.attestation.findBy(
-          undefined,
-          undefined,
-          { schemaId: CUSTOM_SCHEMA_ID, subject: accountData.address },
-          "attestedDate",
-          undefined
-        );
-        setLinkedAttestationsCounter(result.length);
-        console.log("Linked Attestations", result);
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      console.error("SDK not instantiated");
-    }
-  };
 
   return (
     <>
       {!wallet ? (
-        <div className="absolute z-10 w-[45%] h-[45%] ml-[20%] ">
-          <div className="flex flex-col gap-4">
+        <div className="absolute z-10 w-full">
+          <div className="flex flex-col gap-4 mx-auto mt-[10%] w-[40%]">
             <h1>Connect your wallet</h1>
             <p>
               You need to connect your wallet to manage your attestations and
@@ -108,7 +64,7 @@ const Profile = () => {
         </div>
       ) : null}
       <div
-        className={`flex flex-col gap-4 container mx-auto ${
+        className={`w-full lg:container flex flex-col gap-4 mx-auto ${
           !wallet ? "blur-xl" : ""
         }`}
       >
@@ -117,54 +73,25 @@ const Profile = () => {
         <div className="cardContainer space-x-4 mt-4">
           <div className="counterCard border-2 border-solid rounded-md">
             <h3 className="cardTitle"># Attestations</h3>
-            <p>{attestationsCounter}</p>
+            <p>{myAttestations?.length}</p>
           </div>
           <div className="counterCard border-2 border-solid rounded-md">
             <h3 className="cardTitle"># Links</h3>
-            <p>{linkedAttestationsCounter}</p>
+            <p>{myAttestationsLinks?.length}</p>
           </div>
         </div>
-        {/* {myAttestations.map((attestation, i) => (
-        <AttestationCard
-          key={i}
-          id={attestation.id}
-          title={attestation.title}
-          description={attestation.description}
-        />
-      ))} */}
-        {/* <h2 className="text-xl font-bold">Project that you inspired</h2>
-      {projectsInspired.map((project, i) => (
-        <AttestationCard
-          key={i}
-          id={project.id}
-          title={project.title}
-          description={project.description}
-        />
-      ))} */}
         <div className="flex place-content-between border-2 border-solid rounded-md p-4">
           <CreateAttestationForm />
-          <CreateAttestationLinks />
+          <CreateAttestationLinks
+            attestations={attestations}
+            myAttestations={myAttestations}
+          />
         </div>
 
-        <GetProjectsByUser />
+        <GetProjects filterByUser={true} attestations={myAttestations} />
       </div>
     </>
   );
 };
-
-// const AttestationCard = ({ id, title, description }: IAttestation) => {
-//   return (
-//     <div className="border">
-//       <p>{id}</p>
-//       <h3>
-//         <b>Title</b>:{title}
-//       </h3>
-//       <p>
-//         <b>Description</b>
-//         {description}
-//       </p>
-//     </div>
-//   );
-// };
 
 export default Profile;
