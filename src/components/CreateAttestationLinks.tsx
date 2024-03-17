@@ -1,5 +1,5 @@
 import { useConnectWallet } from "@web3-onboard/react";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { Attestation } from "@verax-attestation-registry/verax-sdk";
 
@@ -22,9 +22,11 @@ import {
 const CreateAttestationLinks = ({
   attestations,
   myAttestations,
+  setLinked,
 }: {
   attestations: Attestation[];
   myAttestations: Attestation[];
+  setLinked: Dispatch<SetStateAction<number>>;
 }) => {
   const [selectedOptions, setSelectedOptions] = useState(null);
   const [selectOptions, setSelectOptions] = useState([]);
@@ -87,12 +89,9 @@ const CreateAttestationLinks = ({
       predicate: "inspiredBy",
       object: attestationToLink,
     };
-    await createAttestation(
-      veraxSdk,
-      accountData?.address,
-      true,
-      payload
-    ).catch((e) => setError(`Oops, something went wrong: ${e.message}`));
+    await createAttestation(veraxSdk, accountData?.address, true, payload)
+      .then(() => setLinked((prev) => prev + 1))
+      .catch((e) => setError(`Oops, something went wrong: ${e.message}`));
   };
 
   return (

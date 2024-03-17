@@ -1,5 +1,5 @@
 import { useConnectWallet } from "@web3-onboard/react";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import {
   Card,
@@ -15,7 +15,11 @@ import {
   useVeraxSdk,
 } from "../utils/verax";
 
-const CreateAttestationForm = () => {
+const CreateAttestationForm = ({
+  setCreated,
+}: {
+  setCreated: Dispatch<SetStateAction<number>>;
+}) => {
   const [error, setError] = useState<string>("");
 
   const [{ wallet }] = useConnectWallet();
@@ -48,12 +52,12 @@ const CreateAttestationForm = () => {
       owners: [accountData.address].concat(owners),
       teamName: teamName,
     };
-    createAttestation(veraxSdk, accountData?.address, false, payload).catch(
-      (e) => {
+    createAttestation(veraxSdk, accountData?.address, false, payload)
+      .then(() => setCreated((prev) => prev + 1))
+      .catch((e) => {
         console.error(e);
         setError(`Oops3, something went wrong: ${e.message}`);
-      }
-    );
+      });
   };
 
   return (

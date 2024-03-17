@@ -16,6 +16,9 @@ export type IAttestation = {
 };
 
 const Profile = () => {
+  const [created, setCreated] = useState<number>(0);
+  const [linked, setLinked] = useState<number>(0);
+
   const [attestations, setAttestations] = useState<Attestation[]>();
 
   const [myAttestations, setMyAttestations] = useState<Attestation[]>();
@@ -28,6 +31,14 @@ const Profile = () => {
 
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
+      if (created > 0 || linked > 0) {
+        // sleep 20s to wait for the attestations to be indexed
+        setTimeout(() => {
+          console.log("profile: refresh attestations");
+          setCreated(0);
+          setLinked(0);
+        }, 20000);
+      }
       // get all attestations
       getAttestations(veraxSdk, false)
         .then((res) => setAttestations(res))
@@ -47,7 +58,7 @@ const Profile = () => {
         })
         .catch((e) => console.error(e));
     }
-  }, [veraxSdk, accountData?.address]);
+  }, [veraxSdk, accountData?.address, created, linked]);
 
   return (
     <>
@@ -81,10 +92,11 @@ const Profile = () => {
           </div>
         </div>
         <div className="flex place-content-between border-2 border-solid rounded-md p-4">
-          <CreateAttestationForm />
+          <CreateAttestationForm setCreated={setCreated} />
           <CreateAttestationLinks
             attestations={attestations}
             myAttestations={myAttestations}
+            setLinked={setLinked}
           />
         </div>
 
