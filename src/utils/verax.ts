@@ -49,9 +49,10 @@ export const createAttestation = async (
   if (veraxSdk && userAddress) {
     console.log("Creating attestation with these params:", {
       portalId: PORTAL_ID,
-      linkedAttestationId: CUSTOM_SCHEMA_ID,
+      schemaId: isAttestationLink ? CUSTOM_SCHEMA_ID : SCHEMA_ID,
       expirationDate: Math.floor(Date.now() / 1000) + 25920000,
-      payload: payload,
+      subject: userAddress,
+      attestationData: [payload],
     });
     const txHash = await veraxSdk.portal.attest(
       PORTAL_ID,
@@ -63,7 +64,7 @@ export const createAttestation = async (
       },
       []
     );
-    console.log("TX HASH", txHash);
+    console.log("createAttestation txHash", txHash);
     return txHash;
   } else {
     console.error("SDK not instantiated");
@@ -78,7 +79,7 @@ export const createSchema = async (veraxSdk: VeraxSdk, userAddress: string) => {
       "https://ver.ax/#/tutorials",
       "(string subject, string predicate, string object)"
     );
-    console.log("TX HASH", txHash);
+    console.log("createSchema txHash", txHash);
     return txHash;
   } else {
     console.error("SDK not instantiated");

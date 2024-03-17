@@ -1,3 +1,4 @@
+import { useSetChain, useConnectWallet } from "@web3-onboard/react";
 import { useState, useEffect, useRef } from "react";
 import { ForceGraph2D } from "react-force-graph";
 import type { ForceGraphMethods } from "react-force-graph-2d";
@@ -5,9 +6,10 @@ import * as d3 from "d3";
 import * as uuid from "uuid";
 
 import { Attestation, VeraxSdk } from "@verax-attestation-registry/verax-sdk";
-import { useConnectWallet } from "@web3-onboard/react";
 import { useNetwork } from "wagmi";
 import { getAttestations } from "../../utils/verax";
+
+import { LineaTestnetChain } from "../../utils/costants";
 
 const ForceGraph = () => {
   const [nodes, setNodes] = useState([]);
@@ -16,17 +18,50 @@ const ForceGraph = () => {
   const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
   const [{ wallet }] = useConnectWallet();
   const { chain } = useNetwork();
-  const accountData = wallet?.accounts[0];
   const [attestations, setAttestations] = useState<Attestation[]>([]);
   const [attestationsLinks, setAttestationsLinks] = useState<Attestation[]>([]);
 
+  const [
+    {
+      // chains, // the list of chains that web3-onboard was initialized with
+      connectedChain, // the current chain the user's wallet is connected to
+      // settingChain, // boolean indicating if the chain is in the process of being set
+    },
+    setChain, // function to call to initiate user to switch chains in their wallet
+  ] = useSetChain();
+
+  console.log("Chain", chain);
+
+  const accountData = wallet?.accounts[0];
+  console.log("VERAX SDK (Profile)", veraxSdk);
+
+  console.log("Connected Chain", connectedChain);
+  console.log("Account", accountData);
+
   useEffect(() => {
-    const sdk = new VeraxSdk(
-      VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND,
-      accountData?.address as `0x${string}`
-    );
-    setVeraxSdk(sdk);
-  }, [chain, accountData?.address]);
+    if (!veraxSdk) {
+      if (connectedChain && accountData?.address) {
+        const sdkConf =
+          connectedChain.id === LineaTestnetChain.id
+            ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
+            : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
+        const sdk = new VeraxSdk(
+          sdkConf,
+          accountData?.address as `0x${string}`
+        );
+        setVeraxSdk(sdk);
+        console.log("Verax SDK (after init)", sdk);
+      } else {
+        console.error("Chain not connected");
+        if (accountData?.address) {
+          // so connectedChain is undefined
+          setChain({
+            chainId: LineaTestnetChain.id,
+          });
+        }
+      }
+    }
+  }, [connectedChain, accountData, accountData?.address, setChain, veraxSdk]);
 
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
