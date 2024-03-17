@@ -30,8 +30,8 @@ export const useVeraxSdk = () => {
       if (connectedChain && accountAddress) {
         const sdkConf =
           connectedChain.id === LineaTestnetChain.id
-            ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
-            : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
+            ? VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND
+            : VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND;
         const sdk = new VeraxSdk(sdkConf, accountAddress as `0x${string}`);
         setVeraxSdk(sdk);
       } else {
@@ -119,6 +119,26 @@ export const createSchema = async (veraxSdk: VeraxSdk, userAddress: string) => {
     );
     console.log("createSchema txHash", txHash);
     return txHash;
+  } else {
+    console.error("SDK not instantiated");
+  }
+};
+
+export const checkSchema = async (veraxSdk: VeraxSdk, schemaId: string) => {
+  if (veraxSdk) {
+    const schema = (await veraxSdk.schema.getSchema(schemaId)) as boolean;
+    console.log("checkSchema", schema);
+    return schema;
+  } else {
+    console.error("SDK not instantiated");
+  }
+};
+
+export const checkAllSchemes = async (veraxSdk: VeraxSdk) => {
+  if (veraxSdk) {
+    const s = checkSchema(veraxSdk, SCHEMA_ID);
+    const c = checkSchema(veraxSdk, CUSTOM_SCHEMA_ID);
+    return [s, c];
   } else {
     console.error("SDK not instantiated");
   }
