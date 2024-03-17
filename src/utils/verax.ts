@@ -1,16 +1,48 @@
+import { useEffect, useState } from "react";
 import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
+import { useConnectWallet, useSetChain } from "@web3-onboard/react";
+import { LineaTestnetChain } from "../utils/costants";
 
 const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
 const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
 const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
 
+export const useVeraxSdk = () => {
+  const [{ wallet }] = useConnectWallet();
+  const accountAddress = wallet?.accounts[0].address;
+
+  const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
+  const [{ connectedChain }, setChain] = useSetChain();
+
+  useEffect(() => {
+    if (!veraxSdk) {
+      if (connectedChain && accountAddress) {
+        const sdkConf =
+          connectedChain.id === LineaTestnetChain.id
+            ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
+            : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
+        const sdk = new VeraxSdk(sdkConf, accountAddress as `0x${string}`);
+        setVeraxSdk(sdk);
+      } else {
+        console.error("veraxSdk: Chain not connected");
+        if (accountAddress) {
+          // so connectedChain is undefined
+          setChain({ chainId: LineaTestnetChain.id });
+        }
+      }
+    }
+  }, [veraxSdk, wallet, accountAddress, connectedChain, setChain]);
+
+  return veraxSdk;
+};
+
 export const getAttestations = async (
   veraxSdk: VeraxSdk,
-  isLinkedAttestation: boolean,
+  isAttestationLink: boolean,
   userAddress?: string
 ) => {
   const whereVerax = {
-    schemaId: isLinkedAttestation ? CUSTOM_SCHEMA_ID : SCHEMA_ID,
+    schemaId: isAttestationLink ? CUSTOM_SCHEMA_ID : SCHEMA_ID,
   };
   if (userAddress) {
     whereVerax["subject"] = userAddress;
@@ -29,15 +61,15 @@ export const getAttestations = async (
   }
 };
 
-type IAttestationPayload = {
+export type IAttestationPayload = {
   projectName: string;
   owners: string[];
   teamName: string;
 };
-type IAttestationLinkPayload = {
-  subject_id: string;
+export type IAttestationLinkPayload = {
+  subject: string;
   predicate: string;
-  object_id: string;
+  object: string;
 };
 
 export const createAttestation = async (

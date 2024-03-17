@@ -1,16 +1,13 @@
-// import { useEffect, useState } from "react";
-import { useSetChain, useConnectWallet } from "@web3-onboard/react";
+import "./Profile.css";
+import { useConnectWallet } from "@web3-onboard/react";
 import CreateAttestationLinks from "../components/CreateAttestationLinks";
 import CreateAttestationForm from "../components/CreateAttestationForm";
 import GetProjects from "../components/GetProjects";
 import ConnectButton from "../components/ConnectButton";
-import "./Profile.css";
-import { useNetwork } from "wagmi";
 import { useEffect, useState } from "react";
-import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 
-import { LineaTestnetChain, attestationsData } from "../utils/costants";
-import { getAttestations } from "../utils/verax";
+import { Attestation } from "@verax-attestation-registry/verax-sdk";
+import { getAttestations, useVeraxSdk } from "../utils/verax";
 
 export type IAttestation = {
   id: string;
@@ -19,73 +16,59 @@ export type IAttestation = {
 };
 
 const Profile = () => {
-  const [veraxSdk, setVeraxSdk] = useState<VeraxSdk>();
+  const [attestations, setAttestations] = useState<Attestation[]>();
+
+  const [myAttestations, setMyAttestations] = useState<Attestation[]>();
+  const [myAttestationsLinks, setMyAttestationsLinks] =
+    useState<Attestation[]>();
+
   const [{ wallet }] = useConnectWallet();
-  const { chain } = useNetwork();
-  const [attestationsCounter, setAttestationsCounter] = useState<number>(0);
-  const [linkedAttestationsCounter, setLinkedAttestationsCounter] =
-    useState<number>(0);
-
-  const [
-    {
-      // chains, // the list of chains that web3-onboard was initialized with
-      connectedChain, // the current chain the user's wallet is connected to
-      // settingChain, // boolean indicating if the chain is in the process of being set
-    },
-    setChain, // function to call to initiate user to switch chains in their wallet
-  ] = useSetChain();
-
-  console.log("Chain", chain);
-
   const accountData = wallet?.accounts[0];
-  console.log("VERAX SDK (Profile)", veraxSdk);
-
-  console.log("Connected Chain", connectedChain);
-  console.log("Account", accountData);
-
-  useEffect(() => {
-    if (!veraxSdk) {
-      if (connectedChain && accountData?.address) {
-        const sdkConf =
-          connectedChain.id === LineaTestnetChain.id
-            ? VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND
-            : VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND;
-        const sdk = new VeraxSdk(
-          sdkConf,
-          accountData?.address as `0x${string}`
-        );
-        setVeraxSdk(sdk);
-        console.log("Verax SDK (after init)", sdk);
-      } else {
-        console.error("Chain not connected");
-        if (accountData?.address) {
-          // so connectedChain is undefined
-          setChain({
-            chainId: LineaTestnetChain.id,
-          });
-        }
-      }
-    }
-  }, [connectedChain, accountData, accountData?.address, setChain, veraxSdk]);
+  const veraxSdk = useVeraxSdk();
 
   useEffect(() => {
     if (veraxSdk && accountData?.address) {
-      // get attestations
+      // get all attestations
+      getAttestations(veraxSdk, false)
+        .then((res) => setAttestations(res))
+        .catch((e) => console.error(e));
+      // get all attestations links not needed (for now)
+
+      // get my attestations
       getAttestations(veraxSdk, false, accountData?.address)
-        .then((res) => {
-          setAttestationsCounter(res.length);
-        })
+        .then((res) => setMyAttestations(res))
         .catch((e) => console.error(e));
 
-      // get linked attestations
+      // get my attestations links
       getAttestations(veraxSdk, true, accountData?.address)
         .then((res) => {
-          setLinkedAttestationsCounter(res.length);
+          console.log("profile: my attestations links", res);
+          setMyAttestationsLinks(res);
         })
         .catch((e) => console.error(e));
     } else {
-      const attestations = JSON.parse(JSON.stringify(attestationsData));
-      setAttestationsCounter(attestations.length);
+      console.log(
+        "veraxSdk not set or accountAddress",
+        veraxSdk,
+        accountData?.address
+      );
+    }
+  }, [veraxSdk, accountData?.address]);
+  useEffect(() => {
+    if (veraxSdk && accountData?.address) {
+      // get my attestations
+      getAttestations(veraxSdk, false, accountData?.address)
+        .then((res) => {
+          console.log("profile: my attestations", res);
+          setMyAttestations(res);
+        })
+        .catch((e) => console.error(e));
+    } else {
+      console.log(
+        "veraxSdk not set or accountAddress",
+        veraxSdk,
+        accountData?.address
+      );
     }
   }, [veraxSdk, accountData?.address]);
 
@@ -113,19 +96,22 @@ const Profile = () => {
         <div className="cardContainer space-x-4 mt-4">
           <div className="counterCard border-2 border-solid rounded-md">
             <h3 className="cardTitle"># Attestations</h3>
-            <p>{attestationsCounter}</p>
+            <p>{myAttestations?.length}</p>
           </div>
           <div className="counterCard border-2 border-solid rounded-md">
             <h3 className="cardTitle"># Links</h3>
-            <p>{linkedAttestationsCounter}</p>
+            <p>{myAttestationsLinks?.length}</p>
           </div>
         </div>
         <div className="flex place-content-between border-2 border-solid rounded-md p-4">
           <CreateAttestationForm />
-          <CreateAttestationLinks />
+          <CreateAttestationLinks
+            attestations={attestations}
+            myAttestations={myAttestations}
+          />
         </div>
 
-        <GetProjects filterByUser={true} />
+        <GetProjects filterByUser={true} attestations={attestations} />
       </div>
     </>
   );
