@@ -26,24 +26,16 @@ export const useVeraxSdk = () => {
   const [{ connectedChain }, setChain] = useSetChain();
 
   useEffect(() => {
-    if (!veraxSdk || (connectedChain && connectedChain.id !== LineaTestnetChain.id)) {
-      if (
-        connectedChain === null ||
-        (connectedChain && connectedChain.id === LineaTestnetChain.id)
-      ) {
-        const sdkConf =
-          connectedChain === null ||
-          (connectedChain && connectedChain.id === LineaTestnetChain.id)
-            ? VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND
-            : VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND;
+    if (!veraxSdk) {
+      if (connectedChain) {
         const sdk = new VeraxSdk(
-          sdkConf,
+          VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND,
           accountAddress ? (accountAddress as `0x${string}`) : undefined
         );
         setVeraxSdk(sdk);
       } else {
-        console.error("veraxSdk: Chain not connected");
-        if (accountAddress) {
+        console.log("veraxSdk: Linea Goerli chain not connected");
+        if (connectedChain && accountAddress) {
           // so connectedChain is undefined or not Linea Testnet
           setChain({ chainId: LineaTestnetChain.id });
         }
