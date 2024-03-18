@@ -1,3 +1,7 @@
+export const SCHEMA_ID = "0x0bccab24e4b6b6cc2a71e6bc2874c4d76affaafd28715328782ebb4397e380dd";
+export const CUSTOM_SCHEMA_ID = "0xa14e1c01467bc670edc3790c2692293a2837d1168d0ad87a1a64680216f647fa";
+export const PORTAL_ID = "0x6ae91f2e1657a86aabd186e7c3525bc617ce54ce";
+
 export const LineaTestnetChain = {
   id: "0xe704",
   token: "ETH",

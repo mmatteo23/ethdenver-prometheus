@@ -1,5 +1,6 @@
 import { useConnectWallet } from "@web3-onboard/react";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { waitForTransaction } from '@wagmi/core'
 
 import { Attestation } from "@verax-attestation-registry/verax-sdk";
 
@@ -90,7 +91,11 @@ const CreateAttestationLinks = ({
       object: attestationToLink,
     };
     await createAttestation(veraxSdk, accountData?.address, true, payload)
-      .then(() => setLinked((prev) => prev + 1))
+      .then((res) => {
+        waitForTransaction({
+          hash: res as `0x${string}`,
+        }).then(() => setLinked((prev) => prev + 1))
+      })
       .catch((e) => setError(`Oops, something went wrong: ${e.message}`));
   };
 
