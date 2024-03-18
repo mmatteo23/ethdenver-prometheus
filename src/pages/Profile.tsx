@@ -30,7 +30,6 @@ const Profile = () => {
   const veraxSdk = useVeraxSdk();
 
   useEffect(() => {
-    console.log("veraxSdk e address", veraxSdk, accountData?.address)
     if (veraxSdk) {
       if (created > 0 || linked > 0) {
         // sleep 20s to wait for the attestations to be indexed

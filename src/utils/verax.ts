@@ -26,7 +26,7 @@ export const useVeraxSdk = () => {
   const [{ connectedChain }, setChain] = useSetChain();
 
   useEffect(() => {
-    if (!veraxSdk || !connectedChain || connectedChain.id !== LineaTestnetChain.id) {
+    if (!veraxSdk || (connectedChain && connectedChain.id !== LineaTestnetChain.id)) {
       if (
         connectedChain === null ||
         (connectedChain && connectedChain.id === LineaTestnetChain.id)
@@ -43,8 +43,10 @@ export const useVeraxSdk = () => {
         setVeraxSdk(sdk);
       } else {
         console.error("veraxSdk: Chain not connected");
-        // so connectedChain is undefined or not Linea Testnet
-        setChain({ chainId: LineaTestnetChain.id });
+        if (accountAddress) {
+          // so connectedChain is undefined or not Linea Testnet
+          setChain({ chainId: LineaTestnetChain.id });
+        }
       }
     }
   }, [veraxSdk, wallet, accountAddress, connectedChain, setChain]);
