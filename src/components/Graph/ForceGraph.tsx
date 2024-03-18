@@ -42,6 +42,8 @@ const ForceGraph = ({
         "collision",
         d3.forceCollide((node) => Math.sqrt(100 / (node.level + 1)))
       );
+
+      fgRef.current.zoomToFit()
     }, []);
 
     return (
@@ -49,7 +51,7 @@ const ForceGraph = ({
         ref={fgRef}
         graphData={data}
         //dagMode={"radialout"}
-        dagLevelDistance={300}
+        dagLevelDistance={200}
         backgroundColor="#242430"
         linkColor={() => "rgba(255,255,255,0.2)"}
         nodeRelSize={1}

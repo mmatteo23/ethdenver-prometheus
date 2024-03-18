@@ -73,22 +73,25 @@ const CreateAttestationForm = ({
             <div className="flex flex-col gap-4">
               <label htmlFor="projectName">Project Name</label>
               <input
+                id="projectName"
                 type="text"
                 name="projectName"
                 placeholder="Project Name"
                 className="bg-slate-100 px-2"
               />
 
-              <label htmlFor="owner">Owners</label>
+              <label htmlFor="owners">Owners</label>
               <input
+                id="owners"
                 type="text"
                 name="owners"
                 placeholder="owner1, owner2, owner3"
                 className="bg-slate-100 px-2"
               />
 
-              <label htmlFor="owner">Team Name</label>
+              <label htmlFor="teamName">Team Name</label>
               <input
+                id="teamName"
                 type="text"
                 name="teamName"
                 placeholder="supreme ethdenver team"

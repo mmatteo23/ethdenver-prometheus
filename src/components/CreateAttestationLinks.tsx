@@ -109,6 +109,7 @@ const CreateAttestationLinks = ({
             <div className="flex flex-col gap-4">
               <label htmlFor="baseProject">Choose a project</label>
               <Select
+                id="baseProject"
                 defaultValue={selectedMyOptions}
                 onChange={setSelectedMyOptions}
                 options={selectMyOptions}
@@ -117,6 +118,7 @@ const CreateAttestationLinks = ({
 
               <label htmlFor="attestationToLink">Inspired by</label>
               <Select
+                id="attestationToLink"
                 defaultValue={selectedOptions}
                 onChange={setSelectedOptions}
                 options={selectOptions}
