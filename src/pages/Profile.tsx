@@ -19,18 +19,19 @@ const Profile = () => {
   const [created, setCreated] = useState<number>(0);
   const [linked, setLinked] = useState<number>(0);
 
-  const [attestations, setAttestations] = useState<Attestation[]>();
+  const [attestations, setAttestations] = useState<Attestation[]>([]);
 
-  const [myAttestations, setMyAttestations] = useState<Attestation[]>();
+  const [myAttestations, setMyAttestations] = useState<Attestation[]>([]);
   const [myAttestationsLinks, setMyAttestationsLinks] =
-    useState<Attestation[]>();
+    useState<Attestation[]>([]);
 
   const [{ wallet }] = useConnectWallet();
   const accountData = wallet?.accounts[0];
   const veraxSdk = useVeraxSdk();
 
   useEffect(() => {
-    if (veraxSdk && accountData?.address) {
+    console.log("veraxSdk e address", veraxSdk, accountData?.address)
+    if (veraxSdk) {
       if (created > 0 || linked > 0) {
         // sleep 20s to wait for the attestations to be indexed
         setTimeout(() => {
@@ -58,15 +59,15 @@ const Profile = () => {
         })
         .catch((e) => console.error(e));
     }
-  }, [veraxSdk, accountData?.address, created, linked]);
+  }, [veraxSdk, wallet, accountData?.address, created, linked]);
 
   return (
     <>
       {!wallet ? (
         <div className="absolute z-10 w-full">
-          <div className="flex flex-col gap-4 mx-auto mt-[10%] w-[40%]">
-            <h1>Connect your wallet</h1>
-            <p>
+          <div className="flex flex-col gap-4 mx-auto mt-[10%] w-[60%] lg:w-[40%]">
+            <h1 className="text-xl lg:text-3xl">Connect your wallet</h1>
+            <p className="text-sm lg:text-md">
               You need to connect your wallet to manage your attestations and
               projects inspired.
             </p>
@@ -75,7 +76,7 @@ const Profile = () => {
         </div>
       ) : null}
       <div
-        className={`w-full lg:container flex flex-col gap-4 mx-auto ${
+        className={`w-full container flex flex-col gap-4 mx-auto ${
           !wallet ? "blur-xl" : ""
         }`}
       >

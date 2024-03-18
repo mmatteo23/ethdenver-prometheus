@@ -3,9 +3,9 @@ import { VeraxSdk } from "@verax-attestation-registry/verax-sdk";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import { LineaTestnetChain } from "../utils/costants";
 
-const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA;
-const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA;
-const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL;
+const SCHEMA_ID = import.meta.env.VITE_PROJECT_SCHEMA || "0x0bccab24e4b6b6cc2a71e6bc2874c4d76affaafd28715328782ebb4397e380dd";
+const CUSTOM_SCHEMA_ID = import.meta.env.VITE_CUSTOM_RELATIONSHIP_SCHEMA || "0xa14e1c01467bc670edc3790c2692293a2837d1168d0ad87a1a64680216f647fa";
+const PORTAL_ID = import.meta.env.VITE_PROJECT_PORTAL || "0x6ae91f2e1657a86aabd186e7c3525bc617ce54ce";
 
 export type IAttestationPayload = {
   projectName: string;
@@ -26,7 +26,7 @@ export const useVeraxSdk = () => {
   const [{ connectedChain }, setChain] = useSetChain();
 
   useEffect(() => {
-    if (!veraxSdk) {
+    if (!veraxSdk || !connectedChain || connectedChain.id !== LineaTestnetChain.id) {
       if (
         connectedChain === null ||
         (connectedChain && connectedChain.id === LineaTestnetChain.id)
@@ -43,10 +43,8 @@ export const useVeraxSdk = () => {
         setVeraxSdk(sdk);
       } else {
         console.error("veraxSdk: Chain not connected");
-        if (accountAddress) {
-          // so connectedChain is undefined
-          setChain({ chainId: LineaTestnetChain.id });
-        }
+        // so connectedChain is undefined or not Linea Testnet
+        setChain({ chainId: LineaTestnetChain.id });
       }
     }
   }, [veraxSdk, wallet, accountAddress, connectedChain, setChain]);

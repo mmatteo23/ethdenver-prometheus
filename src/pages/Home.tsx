@@ -37,20 +37,20 @@ const Home = ({ title }: { title: string }) => {
       // get attestations
       getAttestations(veraxSdk, false)
         .then((res) => setAttestations(res))
-        .catch((e) => console.error(e));
+        .catch((e) => console.error(`Home: error getting attestations: ${e}`));
 
       // get attestations links
       getAttestations(veraxSdk, true)
         .then((res) => setAttestationsLinks(res))
-        .catch((e) => console.error(e));
+        .catch((e) => console.error(`Home: error getting attestations links: ${e}`));
     }
   }, [veraxSdk]);
 
   return (
     <>
-      <div className={`w-full lg:container my-10`}>
+      <div className={`w-full lg:container`}>
         <div
-          className="relative h-[400vh] bg-black w-full dark:border dark:border-white/[0.1] rounded-md pt-40 overflow-clip"
+          className="relative h-[400vh] bg-black w-full dark:border dark:border-white/[0.1] rounded-md pt-10 overflow-clip"
           ref={scrollRef}
         >
           <GoogleGeminiEffect
@@ -66,8 +66,8 @@ const Home = ({ title }: { title: string }) => {
             ]}
           />
         </div>
-        <section id="explorer" className="mt-20 mb-10 w-[80%] mx-auto">
-          <h1 className="text-3xl my-10">
+        <section id="explorer" className="mt-20 mb-10 mx-auto container">
+          <h1 className="text-xl lg:text-3xl my-10">
             Explore the network of the interconnected projects
           </h1>
           <div className=" items-center justify-center flex">
@@ -77,8 +77,8 @@ const Home = ({ title }: { title: string }) => {
             />
           </div>
         </section>
-        <section id="get-projects" className="my-10">
-          <h1 className="text-3xl">Explore attestations</h1>
+        <section id="get-projects" className="my-10 container">
+          <h1 className="text-xl lg:text-3xl">Explore attestations</h1>
           <GetProjects filterByUser={false} attestations={attestations} />
         </section>
       </div>

@@ -27,9 +27,7 @@ footer {
 }
 
 .social-icon__link {
-  font-size: 2rem;
-  color: #fff;
-  margin: 0 10px;
+  font-size: 1rem;
   display: inline-block;
   transition: 0.5s;
 }

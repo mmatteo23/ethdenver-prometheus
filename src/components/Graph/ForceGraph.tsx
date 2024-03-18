@@ -19,6 +19,20 @@ const ForceGraph = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ForceTree = ({ data }: { data: { nodes: any; links: any } }) => {
     const fgRef = useRef<ForceGraphMethods>();
+    const [width, setWidth] = useState(window.innerWidth-40);
+    const height = width / 2.3;
+
+    useEffect(() => {
+      const handleResize = () => {
+        setWidth(window.innerWidth-40);
+      };
+  
+      window.addEventListener('resize', handleResize);
+  
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []);
 
     useEffect(() => {
       if (!fgRef.current) return;
@@ -46,8 +60,8 @@ const ForceGraph = ({
         linkDirectionalParticles={2}
         linkDirectionalParticleWidth={2}
         d3VelocityDecay={0.3}
-        width={1270}
-        height={550}
+        width={width}//{1270}
+        height={height}//{550}
         maxZoom={5}
         minZoom={0.5}
       />
