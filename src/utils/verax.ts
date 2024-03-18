@@ -27,12 +27,19 @@ export const useVeraxSdk = () => {
 
   useEffect(() => {
     if (!veraxSdk) {
-      if (connectedChain && accountAddress) {
+      if (
+        connectedChain === null ||
+        (connectedChain && connectedChain.id === LineaTestnetChain.id)
+      ) {
         const sdkConf =
-          connectedChain.id === LineaTestnetChain.id
+          connectedChain === null ||
+          (connectedChain && connectedChain.id === LineaTestnetChain.id)
             ? VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND
             : VeraxSdk.DEFAULT_LINEA_MAINNET_FRONTEND;
-        const sdk = new VeraxSdk(sdkConf, accountAddress as `0x${string}`);
+        const sdk = new VeraxSdk(
+          sdkConf,
+          accountAddress ? (accountAddress as `0x${string}`) : undefined
+        );
         setVeraxSdk(sdk);
       } else {
         console.error("veraxSdk: Chain not connected");
