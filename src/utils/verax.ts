@@ -27,7 +27,7 @@ export const useVeraxSdk = () => {
 
   useEffect(() => {
     if (!veraxSdk) {
-      if (connectedChain) {
+      if (connectedChain === null || (connectedChain && connectedChain.id === LineaTestnetChain.id)) {
         const sdk = new VeraxSdk(
           VeraxSdk.DEFAULT_LINEA_TESTNET_FRONTEND,
           accountAddress ? (accountAddress as `0x${string}`) : undefined
