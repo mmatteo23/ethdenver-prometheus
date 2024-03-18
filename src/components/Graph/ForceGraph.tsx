@@ -42,8 +42,6 @@ const ForceGraph = ({
         "collision",
         d3.forceCollide((node) => Math.sqrt(100 / (node.level + 1)))
       );
-
-      fgRef.current.zoomToFit()
     }, []);
 
     return (
