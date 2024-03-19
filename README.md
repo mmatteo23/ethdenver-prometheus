@@ -19,7 +19,6 @@ See our [Video Demo](https://www.youtube.com/watch?v=L0c7XsBJjMc) or interact wi
 ### Launch in development mode
 
 ```bash
-cp .env.example .env
 yarn
 yarn dev
 ```
