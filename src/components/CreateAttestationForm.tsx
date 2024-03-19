@@ -1,6 +1,6 @@
 import { useConnectWallet } from "@web3-onboard/react";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { waitForTransaction } from '@wagmi/core'
+import { waitForTransaction } from "@wagmi/core";
 
 import {
   Card,
@@ -15,6 +15,7 @@ import {
   createAttestation,
   useVeraxSdk,
 } from "../utils/verax";
+import { LineaTestnetChain } from "../utils/costants";
 
 const CreateAttestationForm = ({
   setCreated,
@@ -56,8 +57,9 @@ const CreateAttestationForm = ({
     createAttestation(veraxSdk, accountData?.address, false, payload)
       .then((res) => {
         waitForTransaction({
+          chainId: parseInt(LineaTestnetChain.id, 16), // should use better hex to number conversion
           hash: res as `0x${string}`,
-        }).then(() => setCreated((prev) => prev + 1))
+        }).then(() => setCreated((prev) => prev + 1));
       })
       .catch((e) => {
         console.error(e);
