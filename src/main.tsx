@@ -9,7 +9,7 @@ import { defaultWagmiConfig } from "@web3modal/wagmi/react";
 
 import { Web3OnboardProvider, init } from "@web3-onboard/react";
 import injectedModule, { ProviderLabel } from "@web3-onboard/injected-wallets";
-import metamaskSDK from '@web3-onboard/metamask'
+//import metamaskSDK from '@web3-onboard/metamask'
 import { chains as metamaskChains } from "./utils/costants.ts";
 
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || "";
@@ -23,6 +23,7 @@ const chains = [linea, lineaTestnet, mainnet];
 const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
 
 // initialize the module with options
+/*
 const metamaskSDKWallet = metamaskSDK({options: {
   extensionOnly: false,
   dappMetadata: {
@@ -30,9 +31,9 @@ const metamaskSDKWallet = metamaskSDK({options: {
     url: metadata.url
   }
 }})
-
+*/
 const wallets = [
-  metamaskSDKWallet,
+  //metamaskSDKWallet,
   injectedModule({
     displayUnavailable: [ProviderLabel.MetaMask] // display specific unavailable wallets
   })

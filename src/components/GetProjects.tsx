@@ -1,5 +1,5 @@
 import { Attestation } from "@verax-attestation-registry/verax-sdk";
-
+import { lessUsername } from "../utils/lib"
 import {
   Table,
   TableCaption,
@@ -23,11 +23,6 @@ const GetProjects = ({
   filterByUser: boolean;
   attestations: Attestation[];
 }) => {
-  const lessUsername = (username: string) => {
-    if (username.length < 10 || !username) {
-      return username;
-    } else return `${username.slice(0, 6)}...${username.slice(-4)}`;
-  };
 
   return (
     <>

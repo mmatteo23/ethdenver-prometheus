@@ -95,7 +95,7 @@ const CreateAttestationLinks = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 w-6/12">
+    <div className="flex flex-col items-center gap-4 w-full">
       <h1 className="text-2xl font-bold">Step2: Link other projects</h1>
       <form onSubmit={handleSubmit} className="flex flex-col max-w-[90%]">
         <Card>

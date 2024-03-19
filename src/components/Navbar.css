@@ -12,7 +12,7 @@
       rgba(255, 221, 183, 0.45) 100%
     );
     border-radius: 10px;
-    padding: 4px;
+    padding: 2px;
     justify-items: center;
     align-items: center;
   }
@@ -24,7 +24,7 @@
   & li a {
     color: white;
     text-align: center;
-    padding: 14px 16px;
+    padding: 10px 12px;
     text-decoration: none;
   }
 
