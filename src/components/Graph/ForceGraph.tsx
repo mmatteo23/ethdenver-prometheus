@@ -19,18 +19,19 @@ const ForceGraph = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ForceTree = ({ data }: { data: { nodes: any; links: any } }) => {
     const fgRef = useRef<ForceGraphMethods>();
-    const [width, setWidth] = useState(window.innerWidth-40);
-    const height = width / 2.3;
+    const [width, setWidth] = useState(window.innerWidth - 40);
+    const tmpHeight = width / 2.3;
+    const height = tmpHeight < 250 ? 250 : tmpHeight;
 
     useEffect(() => {
       const handleResize = () => {
-        setWidth(window.innerWidth-40);
+        setWidth(window.innerWidth - 40);
       };
-  
-      window.addEventListener('resize', handleResize);
-  
+
+      window.addEventListener("resize", handleResize);
+
       return () => {
-        window.removeEventListener('resize', handleResize);
+        window.removeEventListener("resize", handleResize);
       };
     }, []);
 
@@ -49,7 +50,7 @@ const ForceGraph = ({
         ref={fgRef}
         graphData={data}
         //dagMode={"radialout"}
-        dagLevelDistance={200}
+        dagLevelDistance={300}
         backgroundColor="#242430"
         linkColor={() => "rgba(255,255,255,0.2)"}
         nodeRelSize={1}
@@ -60,8 +61,10 @@ const ForceGraph = ({
         linkDirectionalParticles={2}
         linkDirectionalParticleWidth={2}
         d3VelocityDecay={0.3}
-        width={width}//{1270}
-        height={height}//{550}
+        width={width} //{1270}
+        height={height} //{550}
+        cooldownTicks={45}
+        onEngineStop={() => fgRef.current.zoomToFit(400)}
         maxZoom={5}
         minZoom={0.5}
       />
