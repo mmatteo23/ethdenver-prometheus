@@ -31,12 +31,12 @@ const Profile = () => {
   useEffect(() => {
     if (veraxSdk) {
       if (created > 0 || linked > 0) {
-        // sleep 20s to wait for the attestations to be indexed
+        // sleep 2s to wait for the attestations to be indexed, after waitForTransaction
         setTimeout(() => {
           console.log("profile: refresh attestations");
           setCreated(0);
           setLinked(0);
-        }, 20000);
+        }, 2000);
       }
       // get all attestations
       getAttestations(veraxSdk, false)

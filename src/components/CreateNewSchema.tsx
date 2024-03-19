@@ -1,4 +1,5 @@
 import { useConnectWallet } from "@web3-onboard/react";
+import { waitForTransaction } from '@wagmi/core'
 import React, { useState } from "react";
 
 import {
@@ -22,9 +23,14 @@ const CreateNewSchema = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     createSchema(veraxSdk, accountData?.address)
-      .then((res) => setTxHash(res))
-      .catch((e) => setError(e.message));
+      .then((res) => {
+        waitForTransaction({
+          hash: res as `0x${string}`,
+        }).then(() => setTxHash(res))
+      })
+      .catch((e) => setError(e.message)); 
   };
+  
 
   return (
     <div className="flex flex-col items-center gap-4">
