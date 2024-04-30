@@ -20,7 +20,7 @@ const ForceGraph = ({
   const ForceTree = ({ data }: { data: { nodes: any; links: any } }) => {
     const fgRef = useRef<ForceGraphMethods>();
     const [width, setWidth] = useState(window.innerWidth - 40);
-    const tmpHeight = width / 2.3;
+    const tmpHeight = width / 2.7;
     const height = tmpHeight < 250 ? 250 : tmpHeight;
 
     useEffect(() => {

@@ -42,7 +42,9 @@ const Home = ({ title }: { title: string }) => {
       // get attestations links
       getAttestations(veraxSdk, true)
         .then((res) => setAttestationsLinks(res))
-        .catch((e) => console.error(`Home: error getting attestations links: ${e}`));
+        .catch((e) =>
+          console.error(`Home: error getting attestations links: ${e}`)
+        );
     }
   }, [veraxSdk]);
 
@@ -67,9 +69,16 @@ const Home = ({ title }: { title: string }) => {
           />
         </div>
         <section id="explorer" className="mt-20 mb-10 mx-auto container">
-          <h1 className="text-xl lg:text-3xl my-10">
-            Explore the network of the interconnected projects
-          </h1>
+          <div className="flex flex-col gap-2 mt-2 items-center justify-center">
+            <h1 className="text-xl lg:text-3xl">
+              Explore the network of the interconnected projects
+            </h1>
+            <input
+              type="text"
+              className="p-4 my-4 text-lg"
+              placeholder="Search for a project"
+            />
+          </div>
           <div className=" items-center justify-center flex">
             <ForceGraph
               attestations={attestations}
